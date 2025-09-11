@@ -7,7 +7,7 @@ export default function LoginPage() {
         <img
           src="/images/Zeit_login_image.png"
           alt="Imagen de login"
-          className="h-[350px] w-auto object-contain drop-shadow-xl rounded-xl mx-auto"
+          className="h-[250px] w-auto object-contain drop-shadow-xl rounded-xl mx-auto"
         />
       </div>
       <div className="flex flex-col gap-4 p-6 md:p-10">

@@ -3,15 +3,15 @@ import { LoginForm } from "@/components/login-form";
 export default function LoginPage() {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
-      <div className="bg-muted relative hidden lg:block">
+      <div className="bg-blue-600 flex items-center justify-center lg:flex min-h-svh">
         <img
-          src="/images/Zeit_login_image.jpg"
-          alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          src="/images/Zeit_login_image.png"
+          alt="Imagen de login"
+          className="h-[350px] w-auto object-contain drop-shadow-xl rounded-xl mx-auto"
         />
       </div>
       <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex flex-1 items-center justify-center">
+        <div className="flex flex-1 items-center justify-center " >
           <div className="w-full max-w-xs">
             <LoginForm />
           </div>
@@ -20,3 +20,4 @@ export default function LoginPage() {
     </div>
   );
 }
+// huevon el que lo lea

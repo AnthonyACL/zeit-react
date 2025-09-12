@@ -59,8 +59,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" className="border-r border-gray-200" {...props}>
       <SidebarHeader className="p-6">
         <div className="flex items-center gap-1">
-          <span className="text-2xl font-bold text-blue-500">hello</span>
-          <span className="text-2xl font-bold text-orange-400">+</span>
+          <img src="/images/logo.png" alt="Logo" className="h-8 w-auto" />
         </div>
       </SidebarHeader>
       <SidebarContent className="px-3">

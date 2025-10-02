@@ -13,7 +13,7 @@ export default function Page() {
 		<SidebarProvider>
 			<AppSidebar />
 			<SidebarInset>
-				<div className="bg-white w-full h-[80px] flex items-center px-8 shadow-sm mb-8">
+				<div className="bg-white w-full h-[80px] flex items-center px-8 shadow-sm ">
 					<span className="font-bold" style={{ fontSize: 27 }}>Localizaciones</span>
 				</div>
 				<div className="p-8 flex flex-col gap-8">

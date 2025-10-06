@@ -1,41 +1,15 @@
-"use client";
-
+"use client"
 import React, { useState } from 'react';
-import { Search, Edit2, User } from 'lucide-react';
-import { AppSidebar } from '@/app/(admin)/-componentes/app-sidebar';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
-
-// Tipos para tu schedule
-type WorkDay = {
-  start: string;
-  end: string;
-  type: string;
-};
-
-type RestDay = {
-  type: string;
-};
-
-type DaySchedule = WorkDay | RestDay;
-
-type PersonSchedule = {
-  id: number;
-  name: string;
-  role: string;
-  schedule: {
-    L: DaySchedule;
-    M: DaySchedule;
-    Mi: DaySchedule;
-    J: DaySchedule;
-    V: DaySchedule;
-    S: DaySchedule;
-    D: DaySchedule;
-  };
-};
+import { Search, Edit2, User, Clock, X } from 'lucide-react';
+import { AppSidebar } from '@/app/(admin)/-componentes/app-sidebar'
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 
 export default function Page() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [schedules, setSchedules] = useState<PersonSchedule[]>([
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPerson, setSelectedPerson] = useState<any>(null);
+  const [editedSchedule, setEditedSchedule] = useState<any>(null);
+  const [schedules, setSchedules] = useState([
     {
       id: 1,
       name: 'Diego Alonso',
@@ -47,35 +21,154 @@ export default function Page() {
         J: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
         V: { start: '9:00 am', end: '12:30 pm', type: 'Presencial' },
         S: { type: 'Descanso' },
-        D: { type: 'Descanso' },
-      },
+        D: { type: 'Descanso' }
+      }
     },
-    // ... tus otras personas (Manuel, Oscar, etc.) igual
+    {
+      id: 2,
+      name: 'Manuel Echeverria',
+      role: 'Android - Analisis',
+      schedule: {
+        L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        Mi: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        J: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        V: { start: '9:00 am', end: '12:30 pm', type: 'Presencial' },
+        S: { type: 'Descanso' },
+        D: { type: 'Descanso' }
+      }
+    },
+    {
+      id: 3,
+      name: 'Oscar Arias',
+      role: 'Android - Analisis',
+      schedule: {
+        L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        Mi: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        J: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        V: { start: '9:00 am', end: '12:30 pm', type: 'Presencial' },
+        S: { type: 'Descanso' },
+        D: { type: 'Descanso' }
+      }
+    },
+    {
+      id: 4,
+      name: 'Andrea Santiesteban',
+      role: 'Android - Analisis',
+      schedule: {
+        L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        Mi: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        J: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        V: { start: '9:00 am', end: '12:30 pm', type: 'Presencial' },
+        S: { type: 'Descanso' },
+        D: { type: 'Descanso' }
+      }
+    },
+    {
+      id: 5,
+      name: 'Marcelo Scerpella',
+      role: 'Android - Analisis',
+      schedule: {
+        L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        Mi: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        J: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
+        V: { start: '9:00 am', end: '12:30 pm', type: 'Presencial' },
+        S: { type: 'Descanso' },
+        D: { type: 'Descanso' }
+      }
+    }
   ]);
 
   const dayLabels = ['L', 'M', 'Mi', 'J', 'V', 'S', 'D'];
+  const dayNames = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
 
-  const filteredSchedules = schedules.filter(
-    (person) =>
-      person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      person.role.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredSchedules = schedules.filter(person =>
+    person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    person.role.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleEdit = (id: number) => {
-    console.log('Editar persona con ID:', id);
+    const person = schedules.find(p => p.id === id);
+    if (person) {
+      setSelectedPerson(person);
+      setEditedSchedule({ ...person.schedule });
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleTimeChange = (day: string, field: 'start' | 'end', value: string) => {
+    setEditedSchedule((prev: any) => ({
+      ...prev,
+      [day]: {
+        ...prev[day],
+        [field]: value
+      }
+    }));
+  };
+
+  const handleTypeChange = (day: string, type: string) => {
+    setEditedSchedule((prev: any) => ({
+      ...prev,
+      [day]: {
+        ...prev[day],
+        type: type
+      }
+    }));
+  };
+
+  const handleDayTypeToggle = (day: string, isRestDay: boolean) => {
+    if (isRestDay) {
+      setEditedSchedule((prev: any) => ({
+        ...prev,
+        [day]: { type: 'Descanso' }
+      }));
+    } else {
+      setEditedSchedule((prev: any) => ({
+        ...prev,
+        [day]: {
+          start: '8:00 am',
+          end: '5:00 pm',
+          type: 'Virtual'
+        }
+      }));
+    }
+  };
+
+  const handleSave = () => {
+    if (selectedPerson) {
+      setSchedules(prev => prev.map(p => 
+        p.id === selectedPerson.id 
+          ? { ...p, schedule: editedSchedule }
+          : p
+      ));
+      setIsModalOpen(false);
+      setSelectedPerson(null);
+      setEditedSchedule(null);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setSelectedPerson(null);
+    setEditedSchedule(null);
   };
 
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
+        {/* Header */}
         <div className="bg-white w-full h-[80px] flex items-center px-8 shadow-sm mb-8">
-          <span className="font-bold" style={{ fontSize: 27 }}>
-            Horarios
-          </span>
+          <span className="font-bold" style={{ fontSize: 27 }}>Horarios</span>
         </div>
+
+        {/* Content */}
         <div className="px-8 pb-8">
           <div className="bg-white rounded-lg shadow-sm">
+            {/* Search Bar */}
             <div className="border-b border-gray-200 p-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -88,6 +181,8 @@ export default function Page() {
                 />
               </div>
             </div>
+
+            {/* Table */}
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
@@ -115,23 +210,24 @@ export default function Page() {
                           </div>
                         </div>
                       </td>
+
                       {dayLabels.map((day, idx) => {
                         const schedule = person.schedule[day as keyof typeof person.schedule];
-
                         return (
                           <td key={idx} className="px-4 py-4 text-center">
-                            {"start" in schedule ? (
+                            {schedule.type === 'Descanso' ? (
+                              <div className="text-sm text-gray-600">{schedule.type}</div>
+                            ) : (
                               <div className="text-sm">
-                                <div className="text-gray-900">{schedule.start}</div>
-                                <div className="text-gray-900">{schedule.end}</div>
+                                {/* <div className="text-gray-900">{schedule.start || ''}</div>
+                                <div className="text-gray-900">{schedule.end || ''}</div> */}
                                 <div className="text-gray-500 mt-1">{schedule.type}</div>
                               </div>
-                            ) : (
-                              <div className="text-sm text-gray-600">{schedule.type}</div>
                             )}
                           </td>
                         );
                       })}
+
                       <td className="px-4 py-4 text-center">
                         <button
                           onClick={() => handleEdit(person.id)}
@@ -147,10 +243,162 @@ export default function Page() {
             </div>
 
             {filteredSchedules.length === 0 && (
-              <div className="text-center py-12 text-gray-500">No se encontraron resultados</div>
+              <div className="text-center py-12 text-gray-500">
+                No se encontraron resultados
+              </div>
             )}
           </div>
         </div>
+
+        {/* Modal */}
+        {isModalOpen && selectedPerson && editedSchedule && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              {/* Modal Header */}
+              <div className="border-b border-gray-200 p-6 flex justify-between items-center sticky top-0 bg-white">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Editar Horario</h2>
+                  <p className="text-sm text-gray-500 mt-1">{selectedPerson.name}</p>
+                </div>
+                <button
+                  onClick={handleCancel}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 space-y-6">
+                {/* Nombre */}
+                <div className="grid grid-cols-4 gap-4 items-center">
+                  <label className="text-right text-sm font-medium text-gray-700">Nombre</label>
+                  <input
+                    type="text"
+                    value={selectedPerson.name}
+                    disabled
+                    className="col-span-3 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                  />
+                </div>
+
+                {/* Día de la semana */}
+                <div className="grid grid-cols-4 gap-4 items-center">
+                  <label className="text-right text-sm font-medium text-gray-700">Dia de la semana</label>
+                  <div className="col-span-3 flex gap-2">
+                    {dayLabels.map((day) => {
+                      const isRestDay = editedSchedule[day].type === 'Descanso';
+                      return (
+                        <button
+                          key={day}
+                          onClick={() => handleDayTypeToggle(day, !isRestDay)}
+                          className={`px-4 py-2 border-2 rounded-md transition-colors font-medium ${
+                            isRestDay
+                              ? 'border-gray-300 text-gray-400 bg-gray-50'
+                              : 'border-blue-500 text-blue-500 hover:bg-blue-50'
+                          }`}
+                        >
+                          {day}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Horarios por día */}
+                {dayLabels.map((day, idx) => {
+                  const schedule = editedSchedule[day];
+                  const isRestDay = schedule.type === 'Descanso';
+
+                  return (
+                    <div key={day} className="grid grid-cols-4 gap-4 items-center">
+                      <label className="text-right text-sm font-medium text-gray-700">
+                        {dayNames[idx]}
+                      </label>
+                      
+                      {isRestDay ? (
+                        <div className="col-span-3 flex items-center gap-4">
+                          <span className="text-sm text-gray-600">Dia de descanso</span>
+                          <button
+                            onClick={() => handleDayTypeToggle(day, false)}
+                            className="text-blue-500 text-sm hover:underline"
+                          >
+                            Cambiar a día laboral
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="col-span-3 flex items-center gap-2">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="time"
+                              value={schedule.start?.replace(' am', '').replace(' pm', '') || '08:00'}
+                              onChange={(e) => handleTimeChange(day, 'start', e.target.value)}
+                              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                            />
+                            <Clock className="w-4 h-4 text-gray-400" />
+                          </div>
+                          
+                          <span className="text-gray-500">a</span>
+                          
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="time"
+                              value={schedule.end?.replace(' am', '').replace(' pm', '') || '17:00'}
+                              onChange={(e) => handleTimeChange(day, 'end', e.target.value)}
+                              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                            />
+                            <Clock className="w-4 h-4 text-gray-400" />
+                          </div>
+
+                          <span className="text-gray-500">-</span>
+
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleTypeChange(day, 'Virtual')}
+                              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                                schedule.type === 'Virtual'
+                                  ? 'bg-blue-500 text-white'
+                                  : 'border border-gray-300 text-gray-600 hover:bg-gray-50'
+                              }`}
+                            >
+                              V
+                            </button>
+                            <span className="text-gray-500">o</span>
+                            <button
+                              onClick={() => handleTypeChange(day, 'Presencial')}
+                              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                                schedule.type === 'Presencial'
+                                  ? 'bg-blue-500 text-white'
+                                  : 'border border-gray-300 text-gray-600 hover:bg-gray-50'
+                              }`}
+                            >
+                              P
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="border-t border-gray-200 p-6 flex justify-end gap-3 sticky bottom-0 bg-white">
+                <button
+                  onClick={handleCancel}
+                  className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                >
+                  Aceptar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </SidebarInset>
     </SidebarProvider>
   );

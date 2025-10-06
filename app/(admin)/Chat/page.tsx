@@ -13,8 +13,10 @@ export default function Page() {
 			<AppSidebar />
 			<SidebarInset>
 				<div className="bg-white w-full h-[80px] flex items-center px-8 shadow-sm mb-8">
-					<span className="font-bold" style={{ fontSize: 27 }}>Localizaciones</span>
+					<span className="font-bold" style={{ fontSize: 27 }}>Chat</span>
 				</div>
+				Esta pagina esta en proceso de desarrollo 😉
+
 			</SidebarInset>
 		</SidebarProvider>
 	)

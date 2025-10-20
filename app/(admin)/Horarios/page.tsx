@@ -8,12 +8,30 @@ export default function Page() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState<any>(null);
-  const [editedSchedule, setEditedSchedule] = useState<any>(null);
-  const [schedules, setSchedules] = useState([
+  // Tipos para evitar indexado implícito con 'string'
+  type DayKey = 'L' | 'M' | 'Mi' | 'J' | 'V' | 'S' | 'D';
+  type DaySchedule = { start?: string; end?: string; type: string };
+
+  interface Person {
+    id: number;
+    name: string;
+    role: string;
+    areas: string[];
+    area: string;
+    schedule: Record<DayKey, DaySchedule>;
+  }
+
+  const [editedSchedule, setEditedSchedule] = useState<Record<DayKey, DaySchedule> | null>(null);
+  const [selectedArea, setSelectedArea] = useState<string | null>(null);
+  const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
+
+  const [schedules, setSchedules] = useState<Person[]>([
     {
       id: 1,
       name: 'Diego Alonso',
       role: 'Android - Analisis',
+      areas: ['Android - Analisis', 'Operaciones'],
+      area: 'Android - Analisis',
       schedule: {
         L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
         M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
@@ -28,6 +46,8 @@ export default function Page() {
       id: 2,
       name: 'Manuel Echeverria',
       role: 'Android - Analisis',
+      areas: ['Android - Analisis'],
+      area: 'Android - Analisis',
       schedule: {
         L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
         M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
@@ -42,6 +62,8 @@ export default function Page() {
       id: 3,
       name: 'Oscar Arias',
       role: 'Android - Analisis',
+      areas: ['Android - Analisis'],
+      area: 'Android - Analisis',
       schedule: {
         L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
         M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
@@ -56,6 +78,8 @@ export default function Page() {
       id: 4,
       name: 'Andrea Santiesteban',
       role: 'Android - Analisis',
+      areas: ['Android - Analisis'],
+      area: 'Android - Analisis',
       schedule: {
         L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
         M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
@@ -70,6 +94,8 @@ export default function Page() {
       id: 5,
       name: 'Marcelo Scerpella',
       role: 'Android - Analisis',
+      areas: ['Android - Analisis'],
+      area: 'Android - Analisis',
       schedule: {
         L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
         M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
@@ -82,7 +108,7 @@ export default function Page() {
     }
   ]);
 
-  const dayLabels = ['L', 'M', 'Mi', 'J', 'V', 'S', 'D'];
+  const dayLabels: DayKey[] = ['L', 'M', 'Mi', 'J', 'V', 'S', 'D'];
   const dayNames = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
 
   const filteredSchedules = schedules.filter(person =>
@@ -93,41 +119,44 @@ export default function Page() {
   const handleEdit = (id: number) => {
     const person = schedules.find(p => p.id === id);
     if (person) {
-      setSelectedPerson(person);
-      setEditedSchedule({ ...person.schedule });
+      setSelectedPerson(person as Person);
+      setEditedSchedule({ ...person.schedule } as Record<DayKey, DaySchedule>);
+      // inicializar área seleccionada
+      setSelectedArea(person.area ?? (person.areas?.[0] ?? null));
+      setSelectedAreas(person.areas ? [...person.areas] : []);
       setIsModalOpen(true);
     }
   };
 
-  const handleTimeChange = (day: string, field: 'start' | 'end', value: string) => {
-    setEditedSchedule((prev: any) => ({
-      ...prev,
+  const handleTimeChange = (day: DayKey, field: 'start' | 'end', value: string) => {
+    setEditedSchedule((prev) => ({
+      ...(prev as Record<DayKey, DaySchedule>),
       [day]: {
-        ...prev[day],
+        ...((prev as Record<DayKey, DaySchedule>)[day] || {}),
         [field]: value
       }
     }));
   };
 
-  const handleTypeChange = (day: string, type: string) => {
-    setEditedSchedule((prev: any) => ({
-      ...prev,
+  const handleTypeChange = (day: DayKey, type: string) => {
+    setEditedSchedule((prev) => ({
+      ...(prev as Record<DayKey, DaySchedule>),
       [day]: {
-        ...prev[day],
+        ...((prev as Record<DayKey, DaySchedule>)[day] || {}),
         type: type
       }
     }));
   };
 
-  const handleDayTypeToggle = (day: string, isRestDay: boolean) => {
+  const handleDayTypeToggle = (day: DayKey, isRestDay: boolean) => {
     if (isRestDay) {
-      setEditedSchedule((prev: any) => ({
-        ...prev,
+      setEditedSchedule((prev) => ({
+        ...(prev as Record<DayKey, DaySchedule>),
         [day]: { type: 'Descanso' }
       }));
     } else {
-      setEditedSchedule((prev: any) => ({
-        ...prev,
+      setEditedSchedule((prev) => ({
+        ...(prev as Record<DayKey, DaySchedule>),
         [day]: {
           start: '8:00 am',
           end: '5:00 pm',
@@ -141,12 +170,14 @@ export default function Page() {
     if (selectedPerson) {
       setSchedules(prev => prev.map(p => 
         p.id === selectedPerson.id 
-          ? { ...p, schedule: editedSchedule }
+          ? { ...p, schedule: editedSchedule as Record<DayKey, DaySchedule>, area: selectedArea ?? p.area, areas: selectedAreas.length ? selectedAreas : p.areas }
           : p
       ));
       setIsModalOpen(false);
       setSelectedPerson(null);
       setEditedSchedule(null);
+      setSelectedArea(null);
+      setSelectedAreas([]);
     }
   };
 
@@ -279,6 +310,31 @@ export default function Page() {
                     disabled
                     className="col-span-3 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
                   />
+                </div>
+
+                {/* Área (si tiene más de una) */}
+                <div className="grid grid-cols-4 gap-4 items-center">
+                  <label className="text-right text-sm font-medium text-gray-700">Área</label>
+                  <div className="col-span-3">
+                    {selectedPerson.areas && selectedPerson.areas.length > 1 ? (
+                      <select
+                        value={selectedArea ?? ''}
+                        onChange={(e) => setSelectedArea(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
+                      >
+                        {selectedPerson.areas.map((a: string) => (
+                          <option key={a} value={a}>{a}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        value={selectedPerson.area}
+                        disabled
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-600"
+                      />
+                    )}
+                  </div>
                 </div>
 
                 {/* Día de la semana */}

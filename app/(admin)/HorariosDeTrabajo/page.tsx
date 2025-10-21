@@ -113,7 +113,7 @@ export default function Page() {
       <SidebarInset>
         {/* Título fijo */}
         <div className="bg-white w-full h-[80px] flex items-center px-8 shadow-sm mb-8">
-          <span className="font-bold text-2xl">Localizaciones</span>
+          <span className="font-bold text-2xl">Areas</span>
         </div>
 
         <div className="flex h-[calc(100vh-80px)] bg-gray-100">
@@ -135,7 +135,7 @@ export default function Page() {
                 className="w-full flex items-center justify-center gap-2 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded"
               >
                 <Plus size={16} />
-                Añadir nuevo horario
+                Añadir nueva area
               </button>
             </div>
             <div className="overflow-y-auto">

@@ -42,7 +42,7 @@ const data = {
       icon: MessageCircle,
     },
     {
-      title: "Horarios de trabajo",
+      title: "Areas",
       url: "/HorariosDeTrabajo",
       icon: Calendar,
     },

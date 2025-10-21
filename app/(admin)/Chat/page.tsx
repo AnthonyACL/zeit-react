@@ -1,13 +1,90 @@
 "use client"
 import { AppSidebar } from '@/app/(admin)/-componentes/app-sidebar'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { useState } from 'react'
 
 export default function Page() {
   const users = [
-    { id: 1, name: 'Oscar Arias', role: 'Jefe de Área' },
-    { id: 2, name: 'Manuel Echeverría', role: 'Asesor de Ventas' },
-    { id: 3, name: 'Andrea Santiesteban', role: 'RRHH' },
-    { id: 4, name: 'Marcelo Scerpella', role: 'Colaborador' },
+    { id: 1, 
+      name: 'Oscar Arias', 
+      role: 'Jefe de Área',
+      institucion: 'SENATI',
+      sede: 'Independencia',
+      correo: 'manuel@gmail.com',
+      numero: '995368680',
+      horas: '3h 15m',
+      entrada: '8:15 am',
+      messages: [
+        { sender: 'other', text: 'Hola, ¿sucede algo?' },
+        { sender: 'me', text: 'Necesito que me envíes algunos datos' },
+        { sender: 'other', text: '¿Cuáles?' },
+        { sender: 'me', text: 'Horario de tu institución' },
+        { sender: 'other', text: 'Dame un momento' },
+        { sender: 'other', text: 'Aún no lo tengo cuando' },
+        { sender: 'me', text: 'Envíalo lo más antes posible' },
+        { sender: 'other', text: 'Está bien' },
+      ]
+    },
+    { id: 2, 
+      name: 'Manuel Echeverría', 
+      role: 'Asesor de Ventas',
+      institucion: 'SENATI',
+      sede: 'Independencia',
+      correo: 'manuel@gmail.com',
+      numero: '995368680',
+      horas: '3h 15m',
+      entrada: '8:15 am',
+      messages: [
+        { sender: 'other', text: 'Hola, ¿sucede algo?' },
+        { sender: 'me', text: 'Necesito que me envíes algunos datos' },
+        { sender: 'other', text: '¿Cuáles?' },
+        { sender: 'me', text: 'Horario de tu institución' },
+        { sender: 'other', text: 'Dame un momento' },
+        { sender: 'other', text: 'Aún no lo tengo cuando' },
+        { sender: 'me', text: 'Envíalo lo más antes posible' },
+        { sender: 'other', text: 'Está bien' },
+      ]
+    },
+    { id: 3, 
+      name: 'Andrea Santiesteban', 
+      role: 'RRHH',
+      institucion: 'SENATI',
+      sede: 'Independencia',
+      correo: 'manuel@gmail.com',
+      numero: '995368680',
+      horas: '3h 15m',
+      entrada: '8:15 am',
+      messages: [
+        { sender: 'other', text: 'Hola, ¿sucede algo?' },
+        { sender: 'me', text: 'Necesito que me envíes algunos datos' },
+        { sender: 'other', text: '¿Cuáles?' },
+        { sender: 'me', text: 'Horario de tu institución' },
+        { sender: 'other', text: 'Dame un momento' },
+        { sender: 'other', text: 'Aún no lo tengo cuando' },
+        { sender: 'me', text: 'Envíalo lo más antes posible' },
+        { sender: 'other', text: 'Está bien' },
+      ]
+    },
+    { id: 4, 
+      name: 'Marcelo Scerpella', 
+      role: 'Colaborador',
+      institucion: 'SENATI',
+      sede: 'Independencia',
+      correo: 'manuel@gmail.com',
+      numero: '995368680',
+      horas: '3h 15m',
+      entrada: '8:15 am',
+      messages: [
+        { sender: 'other', text: 'Hola, ¿sucede algo?' },
+        { sender: 'me', text: 'Necesito que me envíes algunos datos' },
+        { sender: 'other', text: '¿Cuáles?' },
+        { sender: 'me', text: 'Horario de tu institución' },
+        { sender: 'other', text: 'Dame un momento' },
+        { sender: 'other', text: 'Aún no lo tengo cuando' },
+        { sender: 'me', text: 'Envíalo lo más antes posible' },
+        { sender: 'other', text: 'Está bien' },
+      ]
+    },
   ]
   const manuel = {
     name: 'Manuel Echeverría',
@@ -29,6 +106,27 @@ export default function Page() {
       { sender: 'other', text: 'Está bien' },
     ]
   }
+
+  type Message = {
+    sender: string,
+    text: string,
+  }
+
+  type User = {
+    id: number,
+    name: string,
+    role: string,
+    institucion: string,
+    sede: string,
+    correo: string,
+    numero: string,
+    horas: string,
+    entrada: string,
+    messages: Message[]
+  }
+
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -43,9 +141,8 @@ export default function Page() {
               {users.map((user) => (
                 <li
                   key={user.id}
-                  className={`flex items-center gap-3 p-3 cursor-default ${
-                    user.id === 2 ? 'bg-blue-100 font-semibold' : ''
-                  }`}
+                  onClick={() => setSelectedUser(user)}
+                  className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-blue-100 font-semibold`}
                 >
                   <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                     <svg
@@ -71,7 +168,23 @@ export default function Page() {
           {/*Conversación*/}
           <div className="border rounded-xl flex flex-col shadow-sm">
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
-              {manuel.messages.map((msg, i) => (
+              {selectedUser && (
+                <div className='flex flex-col gap-3'>
+                  {selectedUser.messages.map((msg, index) => (
+                    <div
+                      key={index}
+                      className={`max-w-[70%] p-2 rounded-lg ${
+                        msg.sender === 'me'
+                        ? 'bg-blue-100 ml-auto' 
+                        : 'bg-gray-100'
+                      }`}>
+                      {msg.text}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/*
+              manuel.messages.map((msg, i) => (
                 <div
                   key={i}
                   className={`max-w-[70%] p-2 rounded-lg ${
@@ -82,14 +195,14 @@ export default function Page() {
                 >
                   {msg.text}
                 </div>
-              ))}
+              ))
+              */}
             </div>
             <div className="border-t p-2 flex">
               <input
                 type="text"
                 placeholder="Escriba un mensaje..."
                 className="flex-1 p-2 border rounded-lg outline-none bg-gray-50 text-gray-600"
-                disabled
               />
               <button
                 className="ml-2 bg-blue-500 text-white px-4 rounded-lg cursor-not-allowed"
@@ -100,15 +213,20 @@ export default function Page() {
             </div>
           </div>
           <div className="border rounded-xl p-4 shadow-sm">
-            <h3 className="font-bold text-lg mb-2">{manuel.name}</h3>
-            <p className="text-gray-600 mb-4">{manuel.role}</p>
-            <p><strong>Institución:</strong> {manuel.institucion}</p>
-            <p><strong>Sede:</strong> {manuel.sede}</p>
-            <p><strong>Correo:</strong> {manuel.correo}</p>
-            <p><strong>Número:</strong> {manuel.numero}</p>
-            <p><strong>Horas trabajadas:</strong> {manuel.horas}</p>
-            <p><strong>Hora de entrada:</strong> {manuel.entrada}</p>
+              {selectedUser && (
+                <>
+                  <h3 className="font-bold text-lg mb-2">{selectedUser.name}</h3>
+                  <p className="text-gray-600 mb-4">{selectedUser.role}</p>
+                  <p><strong>Institución:</strong> {selectedUser.institucion}</p>
+                  <p><strong>Sede:</strong> {selectedUser.sede}</p>
+                  <p><strong>Correo:</strong> {selectedUser.correo}</p>
+                  <p><strong>Número:</strong> {selectedUser.numero}</p>
+                  <p><strong>Horas trabajadas:</strong> {selectedUser.horas}</p>
+                  <p><strong>Hora de entrada:</strong> {selectedUser.entrada}</p>
+                </>
+              )}
           </div>
+          
         </div>
       </SidebarInset>
     </SidebarProvider>

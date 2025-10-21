@@ -111,6 +111,29 @@ export default function Page() {
   const dayLabels: DayKey[] = ['L', 'M', 'Mi', 'J', 'V', 'S', 'D'];
   const dayNames = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
 
+  // Convierte '8:00 am' | '5:30 pm' | '08:00' a '08:00' formato 24h
+  function formatTimeString(value?: string) {
+    if (!value) return '';
+    const v = value.trim();
+    // si ya está en formato HH:MM (24h)
+    if (/^\d{1,2}:\d{2}$/.test(v)) {
+      const [h, m] = v.split(':');
+      return `${h.padStart(2, '0')}:${m}`;
+    }
+    // reconocemos 'am'/'pm'
+    const m = v.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/i);
+    if (!m) return v;
+    let hour = parseInt(m[1], 10);
+    const minute = m[2];
+    const ampm = (m[3] || '').toLowerCase();
+    if (ampm === 'am') {
+      if (hour === 12) hour = 0;
+    } else if (ampm === 'pm') {
+      if (hour !== 12) hour += 12;
+    }
+    return `${String(hour).padStart(2, '0')}:${minute}`;
+  }
+
   const filteredSchedules = schedules.filter(person =>
     person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     person.role.toLowerCase().includes(searchTerm.toLowerCase())
@@ -219,6 +242,7 @@ export default function Page() {
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-3 text-left text-sm font-medium text-gray-700"></th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Área</th>
                     {dayLabels.map((day, idx) => (
                       <th key={idx} className="px-4 py-3 text-center text-sm font-medium text-gray-700">
                         {day}
@@ -241,20 +265,23 @@ export default function Page() {
                           </div>
                         </div>
                       </td>
+                      <td className="px-4 py-4 text-gray-700">{person.area}</td>
 
                       {dayLabels.map((day, idx) => {
                         const schedule = person.schedule[day as keyof typeof person.schedule];
+                        if (schedule.type === 'Descanso') {
+                          return (
+                            <td key={idx} className="px-4 py-4 text-center">
+                              <div className="text-sm text-gray-600">{schedule.type}</div>
+                            </td>
+                          );
+                        }
+                        const start = formatTimeString(schedule.start);
+                        const end = formatTimeString(schedule.end);
                         return (
                           <td key={idx} className="px-4 py-4 text-center">
-                            {schedule.type === 'Descanso' ? (
-                              <div className="text-sm text-gray-600">{schedule.type}</div>
-                            ) : (
-                              <div className="text-sm">
-                                {/* <div className="text-gray-900">{schedule.start || ''}</div>
-                                <div className="text-gray-900">{schedule.end || ''}</div> */}
-                                <div className="text-gray-500 mt-1">{schedule.type}</div>
-                              </div>
-                            )}
+                            <div className="text-sm font-medium text-gray-900">{start} - {end}</div>
+                            <div className="text-xs text-gray-500 mt-1">{schedule.type}</div>
                           </td>
                         );
                       })}

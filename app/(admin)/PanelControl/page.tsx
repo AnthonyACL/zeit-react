@@ -61,7 +61,7 @@ export default function Page() {
             <AppSidebar />
             <SidebarInset>
                 <div className="bg-white w-full h-[80px] flex items-center px-8 shadow-sm">
-                    <span className="font-bold text-2xl">Panel de control</span>
+                    <span className="font-bold text-2xl" style={{ fontSize: 27 }}>Panel de control</span>
                 </div>
 
                 <div className="flex">

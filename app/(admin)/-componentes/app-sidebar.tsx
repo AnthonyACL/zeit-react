@@ -43,7 +43,7 @@ const data = {
     },
     {
       title: "Areas",
-      url: "/HorariosDeTrabajo",
+      url: "/Areas",
       icon: Calendar,
     },
     {

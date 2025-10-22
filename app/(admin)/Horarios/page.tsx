@@ -316,7 +316,6 @@ export default function Page() {
               <div className="border-b border-gray-200 p-6 flex justify-between items-center sticky top-0 bg-white">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">Editar Horario</h2>
-                  <p className="text-sm text-gray-500 mt-1">{selectedPerson.name}</p>
                 </div>
                 <button
                   onClick={handleCancel}
@@ -443,7 +442,7 @@ export default function Page() {
                                   : 'border border-gray-300 text-gray-600 hover:bg-gray-50'
                               }`}
                             >
-                              V
+                              Virtual
                             </button>
                             <span className="text-gray-500">o</span>
                             <button
@@ -454,7 +453,7 @@ export default function Page() {
                                   : 'border border-gray-300 text-gray-600 hover:bg-gray-50'
                               }`}
                             >
-                              P
+                              Presencial
                             </button>
                           </div>
                         </div>

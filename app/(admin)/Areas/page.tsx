@@ -104,6 +104,20 @@ export default function Page() {
     const selected = schedules.find((s) => s.id === id);
     if (selected) setCurrentSchedule(selected);
   };
+  const handleCancel = () => {
+  // Puedes resetear el estado, cerrar el modal, o simplemente hacer un log
+  console.log("Cancelado");
+  // Ejemplo: restaurar el horario original si lo estás editando
+  const selected = schedules.find((s) => s.selected);
+  if (selected) setCurrentSchedule(selected);
+  };
+  const handleSave = () => {
+  setSchedules((prev) =>
+    prev.map((s) => (s.id === currentSchedule.id ? currentSchedule : s))
+  );
+  console.log("Horario guardado:", currentSchedule);
+  };
+
 
   const filteredSchedules = schedules.filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -113,7 +127,7 @@ export default function Page() {
       <SidebarInset>
         {/* Título fijo */}
         <div className="bg-white w-full h-[80px] flex items-center px-8 shadow-sm mb-8">
-          <span className="font-bold text-2xl">Areas</span>
+          <span className="font-bold text-2xl"style={{ fontSize: 27 }}>Areas</span>
         </div>
 
         <div className="flex h-[calc(100vh-80px)] bg-gray-100">
@@ -168,18 +182,20 @@ export default function Page() {
                 />
               </div>
 
-              {/* Days */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium mb-2">Día de la semana</label>
-                <div className="flex gap-2">
+                            {/* Días de la semana */}
+              <div className="grid grid-cols-4 gap-4 items-center mb-6">
+                <label className="text-right text-sm font-medium text-gray-700 col-span-1">
+                  Día de la semana
+                </label>
+                <div className="col-span-3 flex gap-2">
                   {(Object.keys(dayLabels) as DayKey[]).map((day) => (
                     <button
                       key={day}
                       onClick={() => handleDayToggle(day)}
-                      className={`px-4 py-2 rounded border ${
+                      className={`px-4 py-2 border-2 rounded-md transition-colors font-medium ${
                         currentSchedule.days[day]
-                          ? "bg-blue-500 text-white border-blue-500"
-                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                          ? "border-blue-500 text-blue-500 hover:bg-blue-50"
+                          : "border-gray-300 text-gray-400 bg-gray-50 hover:border-gray-400"
                       }`}
                     >
                       {day}
@@ -188,8 +204,8 @@ export default function Page() {
                 </div>
               </div>
 
-              {/* Times */}
-              <div className="space-y-3">
+              {/* Horarios por día */}
+              <div className="space-y-4">
                 {(Object.entries({
                   lunes: "Lunes",
                   martes: "Martes",
@@ -197,66 +213,87 @@ export default function Page() {
                   jueves: "Jueves",
                   viernes: "Viernes",
                 }) as [keyof Schedule["times"], string][]).map(([key, label]) => (
-                  <div key={key} className="flex items-center gap-3">
-                    <div className="w-24 text-sm text-gray-600">{label}</div>
-                    <input
-                      type="text"
-                      value={currentSchedule.times[key].start}
-                      onChange={(e) => handleTimeChange(key, "start", e.target.value)}
-                      className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <Clock size={16} className="text-gray-400" />
-                    <span className="text-gray-500">a</span>
-                    <input
-                      type="text"
-                      value={currentSchedule.times[key].end}
-                      onChange={(e) => handleTimeChange(key, "end", e.target.value)}
-                      className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <Clock size={16} className="text-gray-400" />
-                    <span className="text-gray-500">-</span>
-                    <button
-                      onClick={() => handleTimeChange(key, "v", !currentSchedule.times[key].v)}
-                      className={`px-3 py-1.5 text-sm rounded border ${
-                        currentSchedule.times[key].v
-                          ? "bg-blue-500 text-white border-blue-500"
-                          : "bg-white text-gray-700 border-gray-300"
-                      }`}
-                    >
-                      V
-                    </button>
-                    <span className="text-gray-500">o</span>
-                    <button
-                      onClick={() => handleTimeChange(key, "p", !currentSchedule.times[key].p)}
-                      className={`px-3 py-1.5 text-sm rounded border ${
-                        currentSchedule.times[key].p
-                          ? "bg-blue-500 text-white border-blue-500"
-                          : "bg-white text-gray-700 border-gray-300"
-                      }`}
-                    >
-                      P
-                    </button>
+                  <div key={key} className="grid grid-cols-4 gap-4 items-center">
+                    <label className="text-right text-sm font-medium text-gray-700">
+                      {label}
+                    </label>
+
+                    <div className="col-span-3 flex items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="time"
+                          value={currentSchedule.times[key].start}
+                          onChange={(e) => handleTimeChange(key, "start", e.target.value)}
+                          className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                        />
+                        <Clock className="w-4 h-4 text-gray-400" />
+                      </div>
+
+                      <span className="text-gray-500">a</span>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="time"
+                          value={currentSchedule.times[key].end}
+                          onChange={(e) => handleTimeChange(key, "end", e.target.value)}
+                          className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                        />
+                        <Clock className="w-4 h-4 text-gray-400" />
+                      </div>
+
+                      <span className="text-gray-500">-</span>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleTimeChange(key, "v", !currentSchedule.times[key].v)}
+                          className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                            currentSchedule.times[key].v
+                              ? "bg-blue-500 text-white"
+                              : "border border-gray-300 text-gray-600 hover:bg-gray-50"
+                          }`}
+                        >
+                          Virtual
+                        </button>
+                        <span className="text-gray-500">o</span>
+                        <button
+                          onClick={() => handleTimeChange(key, "p", !currentSchedule.times[key].p)}
+                          className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                            currentSchedule.times[key].p
+                              ? "bg-blue-500 text-white"
+                              : "border border-gray-300 text-gray-600 hover:bg-gray-50"
+                          }`}
+                        >
+                          Presencial
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 ))}
 
-                {/* Weekend */}
-                <div className="flex items-center gap-3">
-                  <div className="w-24 text-sm text-gray-600">Sábado</div>
-                  <span className="text-gray-500">Día de descanso</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-24 text-sm text-gray-600">Domingo</div>
-                  <span className="text-gray-500">Día de descanso</span>
-                </div>
+                {/* Fin de semana */}
+                {["Sábado", "Domingo"].map((day) => (
+                  <div key={day} className="grid grid-cols-4 gap-4 items-center">
+                    <label className="text-right text-sm font-medium text-gray-700">
+                      {day}
+                    </label>
+                    <div className="col-span-3 text-sm text-gray-600">Día de descanso</div>
+                  </div>
+                ))}
               </div>
 
-              {/* Buttons */}
-              <div className="flex justify-center gap-4 mt-8">
-                <button className="px-8 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-                  Aceptar
-                </button>
-                <button className="px-8 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition">
+              {/* Footer */}
+              <div className="border-t border-gray-200 p-6 flex justify-end gap-3 sticky bottom-0 bg-white mt-8">
+                <button
+                  onClick={handleCancel}
+                  className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                >
                   Cancelar
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                >
+                  Aceptar
                 </button>
               </div>
             </div>

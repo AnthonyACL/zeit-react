@@ -534,12 +534,9 @@ export default function Page() {
                       <button
                         type="button"
                         onClick={() => {
-                          const areaToAdd = areaSearch?.trim() || formData.area?.trim();
-                          if (areaToAdd && areaToAdd.length && !selectedAreas.includes(areaToAdd)) {
+                          const areaToAdd = areaSearch || formData.area;
+                          if (areaToAdd && !selectedAreas.includes(areaToAdd)) {
                             setSelectedAreas(prev => [...prev, areaToAdd]);
-                            setFormData(prev => ({ ...prev, area: areaToAdd }));
-                            setAreaSearch('');
-                            setShowAreaDropdown(false);
                           }
                         }}
                         className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center"

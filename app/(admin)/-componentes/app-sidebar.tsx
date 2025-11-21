@@ -2,10 +2,51 @@
 
 import type * as React from "react"
 import { LayoutDashboard, MapPin, Clock, Users, MessageCircle, Calendar, FileText } from "lucide-react"
-
+import Link from "next/link"
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar"
+
+const navByRole = {
+  //Aqui se deben elegir las vistas segun el rol del usuario,
+  //En proceso de implementacion de roles
+  Admin: [
+    { title: "Panel de control", url: "/PanelControl", icon: LayoutDashboard },
+    { title: "Localizaciones", url: "/Localizaciones", icon: MapPin },
+    { title: "Horarios", url: "/Horarios", icon: Clock },
+    { title: "Colaboradores", url: "/Colaboradores", icon: Users },
+    { title: "Chat", url: "/Chat", icon: MessageCircle },
+    { title: "Areas", url: "/Areas", icon: Calendar },
+    { title: "Informes", url: "/Informes", icon: FileText },
+  ],
+  Subadmin: [
+    { title: "Panel de control", url: "/PanelControl", icon: LayoutDashboard },
+    { title: "Localizaciones", url: "/Localizaciones", icon: MapPin },
+    { title: "Horarios", url: "/Horarios", icon: Clock },
+    { title: "Colaboradores", url: "/Colaboradores", icon: Users },
+    { title: "Chat", url: "/Chat", icon: MessageCircle },
+    { title: "Areas", url: "/Areas", icon: Calendar },
+    { title: "Informes", url: "/Informes", icon: FileText },
+  ],
+  Moderator: [
+    { title: "Panel de control", url: "/PanelControl", icon: LayoutDashboard },
+    { title: "Localizaciones", url: "/Localizaciones", icon: MapPin },
+    { title: "Horarios", url: "/Horarios", icon: Clock },
+    { title: "Colaboradores", url: "/Colaboradores", icon: Users },
+    { title: "Chat", url: "/Chat", icon: MessageCircle },
+    { title: "Areas", url: "/Areas", icon: Calendar },
+    { title: "Informes", url: "/Informes", icon: FileText },
+  ],
+  Worker: [
+    { title: "Panel de control", url: "/PanelControl", icon: LayoutDashboard },
+    // { title: "Localizaciones", url: "/Localizaciones", icon: MapPin },
+    { title: "Horarios", url: "/Horarios", icon: Clock },
+    { title: "Colaboradores", url: "/Colaboradores", icon: Users },
+    { title: "Chat", url: "/Chat", icon: MessageCircle },
+    { title: "Areas", url: "/Areas", icon: Calendar },
+    { title: "Informes", url: "/Informes", icon: FileText },
+  ],
+}
 
 const data = {
   user: {
@@ -47,8 +88,8 @@ const data = {
       icon: Calendar,
     },
     {
-      title: "Informes",
-      url: "/Informes",
+      title: "Proyectos",
+      url: "/Proyectos",
       icon: FileText,
     },
   ],
@@ -66,7 +107,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter className="p-3">
-        <NavUser user={data.user} />
+        {/* 2. Envolvemos NavUser en el Link */}
+        <Link href="/MiPerfil" className="w-full block">
+            <NavUser user={data.user} />
+        </Link>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

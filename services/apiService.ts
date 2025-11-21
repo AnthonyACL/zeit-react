@@ -21,3 +21,28 @@ export async function apiFetch<T>(
   if (!res.ok) throw new Error(`Error ${res.status}`);
   return res.json() as Promise<T>;
 }
+
+/*  
+    Endpoints disponibles:
+    
+http://127.0.0.1:8000/api/login
+
+http://127.0.0.1:8000/api/users
+
+http://127.0.0.1:8000/api/users/1/profile-image
+
+http://127.0.0.1:8000/api/users/options
+
+http://127.0.0.1:8000/api/work-teams
+
+http://127.0.0.1:8000/api/usercreate
+
+http://127.0.0.1:8000/api/projects
+
+http://127.0.0.1:8000/api/projects/2
+
+http://127.0.0.1:8000/api/projects
+
+http://127.0.0.1:8000/api/projects/1
+
+*/

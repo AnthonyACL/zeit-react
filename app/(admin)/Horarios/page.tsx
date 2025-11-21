@@ -1,14 +1,16 @@
 "use client"
-import React, { useState } from 'react';
+
+import React, { useState, useMemo } from 'react';
 import { Search, Edit2, User, Clock, X } from 'lucide-react';
 import { AppSidebar } from '@/app/(admin)/-componentes/app-sidebar'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 
 export default function Page() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [filtroArea, setFiltroArea] = useState<string>('todos');
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState<any>(null);
-  // Tipos para evitar indexado implícito con 'string'
   type DayKey = 'L' | 'M' | 'Mi' | 'J' | 'V' | 'S' | 'D';
   type DaySchedule = { start?: string; end?: string; type: string };
 
@@ -17,7 +19,7 @@ export default function Page() {
     name: string;
     role: string;
     areas: string[];
-    area: string;
+    area: string; 
     schedule: Record<DayKey, DaySchedule>;
   }
 
@@ -105,22 +107,41 @@ export default function Page() {
         S: { type: 'Descanso' },
         D: { type: 'Descanso' }
       }
+    },
+    {
+      id: 6,
+      name: 'Carla Rodriguez',
+      role: 'Diseñadora Gráfica',
+      areas: ['Marketing', 'Diseño'],
+      area: 'Marketing',
+      schedule: {
+        L: { start: '9:00 am', end: '6:00 pm', type: 'Presencial' },
+        M: { start: '9:00 am', end: '6:00 pm', type: 'Presencial' },
+        Mi: { start: '9:00 am', end: '6:00 pm', type: 'Virtual' },
+        J: { start: '9:00 am', end: '6:00 pm', type: 'Presencial' },
+        V: { start: '9:00 am', end: '6:00 pm', type: 'Virtual' },
+        S: { type: 'Descanso' },
+        D: { type: 'Descanso' }
+      }
     }
   ]);
 
   const dayLabels: DayKey[] = ['L', 'M', 'Mi', 'J', 'V', 'S', 'D'];
   const dayNames = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
 
-  // Convierte '8:00 am' | '5:30 pm' | '08:00' a '08:00' formato 24h
+  const allAreas = useMemo(() => {
+    const areas = [...new Set(schedules.map(person => person.area))];
+    areas.sort();
+    return areas;
+  }, [schedules]);
+
   function formatTimeString(value?: string) {
     if (!value) return '';
     const v = value.trim();
-    // si ya está en formato HH:MM (24h)
     if (/^\d{1,2}:\d{2}$/.test(v)) {
       const [h, m] = v.split(':');
       return `${h.padStart(2, '0')}:${m}`;
     }
-    // reconocemos 'am'/'pm'
     const m = v.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/i);
     if (!m) return v;
     let hour = parseInt(m[1], 10);
@@ -134,17 +155,21 @@ export default function Page() {
     return `${String(hour).padStart(2, '0')}:${minute}`;
   }
 
-  const filteredSchedules = schedules.filter(person =>
-    person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    person.role.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredSchedules = schedules.filter(person => {
+    const matchArea = filtroArea === 'todos' || person.area === filtroArea;
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    const matchSearch =
+      person.name.toLowerCase().includes(lowerSearchTerm) ||
+      person.role.toLowerCase().includes(lowerSearchTerm);
+
+    return matchArea && matchSearch;
+  });
 
   const handleEdit = (id: number) => {
     const person = schedules.find(p => p.id === id);
     if (person) {
       setSelectedPerson(person as Person);
       setEditedSchedule({ ...person.schedule } as Record<DayKey, DaySchedule>);
-      // inicializar área seleccionada
       setSelectedArea(person.area ?? (person.areas?.[0] ?? null));
       setSelectedAreas(person.areas ? [...person.areas] : []);
       setIsModalOpen(true);
@@ -214,7 +239,7 @@ export default function Page() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        {/* Header */}
+        {/* Header*/}
         <div className="bg-white w-full h-[80px] flex items-center px-8 shadow-sm mb-8">
           <span className="font-bold" style={{ fontSize: 27 }}>Horarios</span>
         </div>
@@ -222,23 +247,47 @@ export default function Page() {
         {/* Content */}
         <div className="px-8 pb-8">
           <div className="bg-white rounded-lg shadow-sm">
-            {/* Search Bar */}
+            
+            {/* Search Bar + Filtro de Área */}
             <div className="border-b border-gray-200 p-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+              <div className="flex items-center gap-4">
+                {/* Search Bar */}
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre o rol..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                
+                {/* Filtro de Área */}
+                <div className="flex items-center gap-2">
+                  <label htmlFor="areaFilter" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                    Filtrar por Área:
+                  </label>
+                  <select
+                    id="areaFilter"
+                    value={filtroArea}
+                    onChange={(e) => setFiltroArea(e.target.value)}
+                    className="border border-gray-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  >
+                    <option value="todos">Todas las áreas</option>
+                    {allAreas.map((area) => (
+                      <option key={area} value={area}>{area}</option>
+                    ))}
+                  </select>
+                </div>
+
               </div>
             </div>
 
             {/* Table */}
             <div className="overflow-x-auto">
               <table className="w-full">
+                {/* ... (thead) ... */}
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-3 text-left text-sm font-medium text-gray-700"></th>
@@ -252,8 +301,10 @@ export default function Page() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
+                  {/*  Itera sobre filteredSchedules */}
                   {filteredSchedules.map((person) => (
                     <tr key={person.id} className="hover:bg-gray-50 transition-colors">
+                      {/* ... (td de persona ) ... */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
@@ -267,6 +318,7 @@ export default function Page() {
                       </td>
                       <td className="px-4 py-4 text-gray-700">{person.area}</td>
 
+                      {/* ... (td de horarios ) ... */}
                       {dayLabels.map((day, idx) => {
                         const schedule = person.schedule[day as keyof typeof person.schedule];
                         if (schedule.type === 'Descanso') {
@@ -286,6 +338,7 @@ export default function Page() {
                         );
                       })}
 
+                      {/* ... (td de botón editar ) ... */}
                       <td className="px-4 py-4 text-center">
                         <button
                           onClick={() => handleEdit(person.id)}
@@ -300,15 +353,16 @@ export default function Page() {
               </table>
             </div>
 
+            {/* [CAMBIO] Mensaje de "No se encontraron resultados" */}
             {filteredSchedules.length === 0 && (
               <div className="text-center py-12 text-gray-500">
-                No se encontraron resultados
+                No se encontraron resultados para los filtros aplicados.
               </div>
             )}
           </div>
         </div>
 
-        {/* Modal */}
+        {/* Modal (sin cambios en su lógica interna) */}
         {isModalOpen && selectedPerson && editedSchedule && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">

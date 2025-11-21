@@ -1,10 +1,13 @@
 "use client"
 import React, { useState } from 'react';
-import { Search, Edit2, ChevronDown, Plus } from 'lucide-react';
+// [CAMBIO] Importamos el ícono de basura
+import { Search, Edit2, ChevronDown, Plus, Trash2 } from 'lucide-react';
 import { AppSidebar } from '@/app/(admin)/-componentes/app-sidebar'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+
 export default function Page() {
   const [colaboradores, setColaboradores] = useState([
+    // ... (tus colaboradores se mantienen igual) ...
     {
       id: 1,
       nombre: 'Diego Alonso',
@@ -66,6 +69,7 @@ export default function Page() {
       institucion: 'UPC'
     },
   ]);
+
   const cargosOptions = [ 'RRHH', 'Asesor de Ventas', 'Jefe de Area', 'Colaborador'];
   const areasOptions = [
     'Desarrollo React',
@@ -111,9 +115,10 @@ export default function Page() {
     'CERTUS',
     'ISIL - Instituto San Ignacio de Loyola'
   ];
-  const [selectedArea, setSelectedArea] = useState<string | null>(null);
-  const [searchAreas, setSearchAreas] = useState(""); 
+  
+  const [filtroArea, setFiltroArea] = useState<string>('todos');
   const [searchColaboradores, setSearchColaboradores] = useState(""); 
+  
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [selectedColaborador, setSelectedColaborador] = useState<any>(null);
@@ -128,13 +133,20 @@ export default function Page() {
     area: '',
     institucion: ''
   });
+  
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
   const [areaSearch, setAreaSearch] = useState('');
   const [institucionSearch, setInstitucionSearch] = useState('');
   const [showAreaDropdown, setShowAreaDropdown] = useState(false);
   const [showInstitucionDropdown, setShowInstitucionDropdown] = useState(false);
   const [showCargoDropdown, setShowCargoDropdown] = useState(false);
+
+  // [NUEVO] Estados para el modal de eliminación
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [colaboradorToDelete, setColaboradorToDelete] = useState<any>(null);
+  
   const resetForm = () => {
+    // ... (función sin cambios)
     setFormData({
       nombre: '',
       dni: '',
@@ -150,23 +162,28 @@ export default function Page() {
     setInstitucionSearch('');
     setSelectedAreas([]);
   };
+
   const handleAdd = () => {
+    // ... (función sin cambios)
     resetForm();
     setSelectedColaborador(null);
     setModalMode('add');
     setModalOpen(true);
   };
+
   const handleEdit = (colaborador: any) => {
+    // ... (función sin cambios)
     setSelectedColaborador(colaborador);
     setFormData({ ...colaborador });
     setAreaSearch(colaborador.area || '');
     setInstitucionSearch(colaborador.institucion || '');
-    // inicializar areas seleccionadas si existen
     setSelectedAreas(colaborador.areas ? [...colaborador.areas] : (colaborador.area ? [colaborador.area] : []));
     setModalMode('edit');
     setModalOpen(true);
   };
+
   const handleSubmit = () => {
+    // ... (función sin cambios)
     if (modalMode === 'add') {
       const newColaborador = {
         ...formData,
@@ -184,185 +201,176 @@ export default function Page() {
     setModalOpen(false);
     resetForm();
   };
+
   const handleCancel = () => {
+    // ... (función sin cambios)
     setModalOpen(false);
     resetForm();
     setSelectedColaborador(null);
   };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // ... (función sin cambios)
     const { name, value } = e.target;
     setFormData((prev) => ({ 
         ...prev, 
         [name]: value 
     }));
   };
+
   const handleCargoSelect = (cargo: string) => {
+    // ... (función sin cambios)
     setFormData((prev) => ({ ...prev, cargo }));
     setShowCargoDropdown(false);
   };
+
   const handleAreaSearch = (value: string) => {
+    // ... (función sin cambios)
     setAreaSearch(value);
     setFormData((prev) => ({ ...prev, area: value }));
     setShowAreaDropdown(true);
   };
+
   const handleAreaSelect = (area: string) => {
+    // ... (función sin cambios)
     setAreaSearch(area);
     setFormData((prev) => ({ ...prev, area }));
     setShowAreaDropdown(false);
   };
+
   const handleInstitucionSearch = (value: string) => {
+    // ... (función sin cambios)
     setInstitucionSearch(value);
     setFormData((prev) => ({ ...prev, institucion: value }));
     setShowInstitucionDropdown(true);
   };
+
   const handleInstitucionSelect = (institucion: string) => {
+    // ... (función sin cambios)
     setInstitucionSearch(institucion);
     setFormData((prev) => ({ ...prev, institucion }));
     setShowInstitucionDropdown(false);
   };
+
+  // [NUEVO] Abrir modal de confirmación de borrado
+  const handleDeleteClick = (colaborador: any) => {
+    setColaboradorToDelete(colaborador);
+    setDeleteModalOpen(true);
+  };
+
+  // [NUEVO] Cancelar borrado
+  const handleCancelDelete = () => {
+    setDeleteModalOpen(false);
+    setColaboradorToDelete(null);
+  };
+
+  // [NUEVO] Confirmar y ejecutar borrado
+  const handleConfirmDelete = () => {
+    if (colaboradorToDelete) {
+      setColaboradores(
+        colaboradores.filter((col) => col.id !== colaboradorToDelete.id)
+      );
+    }
+    handleCancelDelete(); // Cierra el modal y resetea el estado
+  };
+
   const filteredAreas = areasOptions.filter((area) =>
-    area.toLowerCase().includes(searchAreas.toLowerCase())
+    area.toLowerCase().includes(areaSearch.toLowerCase())
   );
-  const colaboradoresPorArea = selectedArea
-    ? colaboradores.filter((col) => col.area === selectedArea)
-    : [];
-  const filteredColaboradores = colaboradoresPorArea.filter(
-    (col) =>
-      col.nombre.toLowerCase().includes(searchColaboradores.toLowerCase()) ||
-      col.correo.toLowerCase().includes(searchColaboradores.toLowerCase())
+
+  const filteredColaboradores = colaboradores.filter(
+    // ... (lógica de filtro sin cambios)
+    (col) => {
+      const matchArea = filtroArea === 'todos' || col.area === filtroArea;
+      const searchTerm = searchColaboradores.toLowerCase();
+      const matchSearch =
+        col.nombre.toLowerCase().includes(searchTerm) ||
+        col.correo.toLowerCase().includes(searchTerm);
+      return matchArea && matchSearch;
+    }
   );
+
+
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        {/* Header */}
+        {/* Header (sin cambios) */}
         <div className="bg-white w-full h-[80px] flex items-center px-8 shadow-sm mb-8">
           <span className="font-bold" style={{ fontSize: 27 }}>Colaboradores</span>
         </div>
-        {/* VISTA A: Lista de Áreas (searchAreas)
-            - aquí está EL BOTÓN "Añadir colaborador" */}
-        {!selectedArea && (
-          <div className="px-8">
-            <div className="bg-white rounded-lg shadow-sm">
-              <div className="p-6 border-b flex items-center justify-between">
-                {/* Buscador para áreas */}
-                <div className="flex items-center gap-3 flex-1">
-                  <Search className="text-gray-400" size={20} />
-                  <input
-                    type="text"
-                    placeholder="Buscar área..."
-                    value={searchAreas}
-                    onChange={(e) => setSearchAreas(e.target.value)}
-                    className="flex-1 outline-none text-gray-700"
-                  />
-                </div>
-                {/* BOTÓN Añadir colaborador -> visible SÓLO en vista de áreas */}
-                <button
-                  onClick={handleAdd}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-                >
-                  Añadir colaborador
-                </button>
+
+        <div className="px-8">
+          <div className="bg-white rounded-lg shadow-sm">
+            
+            {/* Barra de controles unificada (sin cambios) */}
+            <div className="p-6 border-b flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3 flex-1 min-w-[300px]">
+                <Search className="text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Buscar colaborador por nombre o correo..."
+                  value={searchColaboradores}
+                  onChange={(e) => setSearchColaboradores(e.target.value)}
+                  className="flex-1 outline-none text-gray-700 border border-gray-300 rounded-lg px-3 py-2"
+                />
               </div>
-              {/* Tabla que lista las áreas y la cantidad de colaboradores por área */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
-                    <tr>
-                      <th className="text-left p-4 font-medium text-gray-700">
-                        Área
-                      </th>
-                      <th className="text-left p-4 font-medium text-gray-700">
-                        N° colaboradores
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredAreas.map((area) => {
-                      const count = colaboradores.filter(
-                        (c) => c.area === area
-                      ).length;
-                      return (
-                        <tr
-                          key={area}
-                          className="border-b hover:bg-gray-50 cursor-pointer"
-                          onClick={() => {
-                            setSelectedArea(area);
-                            setSearchColaboradores(""); // limpiar buscador de colaboradores al entrar
-                          }}
-                        >
-                          <td className="p-4 text-gray-800 font-medium">
-                            {area}
-                          </td>
-                          <td className="p-4 text-gray-600">{count}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div className="flex items-center gap-2">
+                 <label htmlFor="areaFilter" className="text-gray-700 font-medium">
+                   Filtrar por Área:
+                 </label>
+                 <select
+                   id="areaFilter"
+                   value={filtroArea}
+                   onChange={(e) => setFiltroArea(e.target.value)}
+                   className="border border-gray-300 rounded-lg px-3 py-2 outline-none text-gray-700 bg-white"
+                 >
+                   <option value="todos">Todas las áreas</option>
+                   {areasOptions.map((area) => (
+                     <option key={area} value={area}>{area}</option>
+                   ))}
+                 </select>
               </div>
+              <button
+                onClick={handleAdd}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              >
+                Añadir colaborador
+              </button>
             </div>
-          </div>
-        )}
-        {/* VISTA B: Colaboradores de una Área seleccionada (searchColaboradores)*/}
-        {selectedArea && (
-          <div className="px-8">
-            <div className="bg-white rounded-lg shadow-sm">
-              <div className="p-6 border-b flex items-center justify-between">
-                {/* Volver a áreas */}
-                <div className="flex items-center gap-3 flex-1">
-                  <button
-                    onClick={() => {
-                      setSelectedArea(null);
-                      setSearchAreas("");
-                    }}
-                    className="text-blue-600 hover:underline"
-                  >
-                    ← Volver a áreas
-                  </button>
-                  <h2 className="font-semibold text-gray-800 ml-4">
-                    {selectedArea}
-                  </h2>
-                </div>
-                {/* Buscador para colaboradores (solo en vista de área) */}
-                <div className="flex items-center gap-3 flex-1 justify-end">
-                  <Search className="text-gray-400" size={20} />
-                  <input
-                    type="text"
-                    placeholder="Buscar colaborador..."
-                    value={searchColaboradores}
-                    onChange={(e) => setSearchColaboradores(e.target.value)}
-                    className="flex-1 outline-none text-gray-700 border border-gray-300 rounded-lg px-3 py-1"
-                  />
-                </div>
-              </div>
-              {/* Tabla de colaboradores filtrados por área + búsqueda */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
-                    <tr>
-                      <th className="text-left p-4 font-medium text-gray-700">
-                        Nombre
-                      </th>
-                      <th className="text-left p-4 font-medium text-gray-700">
-                        Correo electrónico
-                      </th>
-                      <th className="text-left p-4 font-medium text-gray-700">
-                        Teléfono
-                      </th>
-                      <th className="text-left p-4 font-medium text-gray-700">
-                        Institucion
-                      </th>
-                      <th className="w-16"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredColaboradores.map((colaborador) => (
-                      <tr
-                        key={colaborador.id}
-                        className="border-b hover:bg-gray-50"
-                      >
-                        <td className="p-4">
+
+            {/* Tabla de colaboradores filtrados */}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                {/* ... (thead sin cambios) ... */}
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Nombre
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Correo electrónico
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Teléfono
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Institucion
+                    </th>
+                    <th className="text-left p-4 font-medium text-gray-700">
+                      Área
+                    </th>
+                    <th className="w-16"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredColaboradores.map((colaborador) => (
+                    <tr
+                      key={colaborador.id}
+                      className="border-b hover:bg-gray-50"
+                    >
+                      {/* ... (td de nombre, correo, telefono, institucion, area sin cambios) ... */}
+                      <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -376,45 +384,64 @@ export default function Page() {
                           </div>
                         </div>
                       </td>
-                        <td className="p-4 text-gray-700">
-                          {colaborador.correo}
-                        </td>
-                        <td className="p-4 text-gray-700">
-                          {colaborador.telefono}
-                        </td>
-                        <td className="p-4 text-gray-700">
-                          {colaborador.institucion}
-                        </td>
-                        <td className="p-4">
+                      <td className="p-4 text-gray-700">
+                        {colaborador.correo}
+                      </td>
+                      <td className="p-4 text-gray-700">
+                        {colaborador.telefono}
+                      </td>
+                      <td className="p-4 text-gray-700">
+                        {colaborador.institucion}
+                      </td>
+                      <td className="p-4 text-gray-700">
+                        {colaborador.area}
+                      </td>
+                      
+                      {/* [CAMBIO] Celda de acciones con ambos botones */}
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
                           <button
                             onClick={() => handleEdit(colaborador)}
                             className="text-blue-500 hover:text-blue-700 transition-colors"
+                            title="Editar"
                           >
                             <Edit2 size={20} />
                           </button>
-                        </td>
-                      </tr>
-                    ))}
-                    {/* Mensaje cuando no hay colaboradores en el área */}
-                    {filteredColaboradores.length === 0 && (
-                      <tr>
-                        <td
-                          colSpan={5}
-                          className="p-6 text-center text-gray-500"
-                        >
-                          No hay colaboradores que coincidan con la búsqueda.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                          
+                          {/* [NUEVO] Botón de eliminar */}
+                          <button
+                            onClick={() => handleDeleteClick(colaborador)}
+                            className="text-red-500 hover:text-red-700 transition-colors"
+                            title="Eliminar"
+                          >
+                            <Trash2 size={20} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  
+                  {/* Mensaje cuando no hay colaboradores (sin cambios) */}
+                  {filteredColaboradores.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="p-6 text-center text-gray-500"
+                      >
+                        No hay colaboradores que coincidan con la búsqueda o filtro.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
-        )}
-        {/* MODAL: Añadir / Editar */}
+        </div>
+
+        {/* MODAL: Añadir / Editar (Sin cambios) */}
         {modalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            {/* ... (todo el contenido del modal de añadir/editar) ... */}
             <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-8">
               <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
                 {modalMode === "add"
@@ -559,7 +586,6 @@ export default function Page() {
                         ))}
                       </div>
                     )}
-                    {/* Chips con las áreas seleccionadas */}
                     {selectedAreas.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-2">
                         {selectedAreas.map(a => (
@@ -636,6 +662,40 @@ export default function Page() {
             </div>
           </div>
         )}
+        
+        {/* [NUEVO] MODAL: Confirmación de Eliminación */}
+        {deleteModalOpen && colaboradorToDelete && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8">
+              <h2 className="text-2xl font-semibold text-gray-800 text-center mb-4">
+                Confirmar Eliminación
+              </h2>
+              <p className="text-center text-gray-600 mb-8">
+                ¿Estás seguro de que deseas eliminar al colaborador{" "}
+                <strong>{colaboradorToDelete.nombre}</strong>?
+                <br />
+                Esta acción no se puede deshacer.
+              </p>
+              
+              {/* BOTONES CONFIRMAR / CANCELAR */}
+              <div className="flex justify-center gap-4 mt-8">
+                <button
+                  onClick={handleConfirmDelete}
+                  className="px-8 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+                >
+                  Eliminar
+                </button>
+                <button
+                  onClick={handleCancelDelete}
+                  className="px-8 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </SidebarInset>
     </SidebarProvider>
   );

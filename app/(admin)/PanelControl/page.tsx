@@ -143,7 +143,7 @@ export default function Page() {
     const tasaActividad = Math.round((totalDentroUsers / totalStaff) * 100);
 
     const getStatusColor = (status: string) => {
-        switch(status) {
+        switch (status) {
             case 'Completado': return 'bg-green-100 text-green-700';
             case 'En progreso': return 'bg-blue-100 text-blue-700';
             case 'Pendiente': return 'bg-yellow-100 text-yellow-700';
@@ -171,9 +171,8 @@ export default function Page() {
                             <button
                                 key={r}
                                 onClick={() => setResumen(r as any)}
-                                className={`px-4 py-1 rounded-full transition-colors ${
-                                    resumen === r ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'
-                                }`}
+                                className={`px-4 py-1 rounded-full transition-colors ${resumen === r ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'
+                                    }`}
                             >
                                 {r.charAt(0).toUpperCase() + r.slice(1)}
                             </button>
@@ -182,10 +181,10 @@ export default function Page() {
                 </div>
 
                 <div className="flex flex-col lg:flex-row h-[calc(100vh-70px)] bg-gray-50 overflow-hidden">
-                    
+
                     {/* 1. COLUMNA PRINCIPAL (IZQUIERDA) */}
                     <div className="flex-1 p-6 overflow-y-auto space-y-6">
-                        
+
                         {/* SECCIÓN A: KPIs / Métricas Clave */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
@@ -207,7 +206,7 @@ export default function Page() {
                                 <div className="flex items-end justify-between mt-2">
                                     <h3 className="text-3xl font-bold text-gray-800">{tasaActividad}%</h3>
                                     <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <div className="h-full bg-indigo-500" style={{width: `${tasaActividad}%`}}></div>
+                                        <div className="h-full bg-indigo-500" style={{ width: `${tasaActividad}%` }}></div>
                                     </div>
                                 </div>
                             </div>
@@ -266,12 +265,12 @@ export default function Page() {
                                 <h3 className="font-bold text-gray-800">Áreas Destacadas</h3>
                                 <Button variant="ghost" size="sm" className="text-xs text-gray-500 hover:text-gray-800">Ver todas</Button>
                             </div>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* Aquí usamos la variable filtrada areasDestacadas */}
                                 {areasDestacadas.map((area) => (
-                                    <div key={area.nombre} onClick={() => openPopup(area.nombre)} 
-                                         className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-shadow">
+                                    <div key={area.nombre} onClick={() => openPopup(area.nombre)}
+                                        className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-shadow">
                                         <div className="flex justify-between items-center mb-2">
                                             <span className="font-semibold text-gray-700">{area.nombre}</span>
                                             <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">→</span>
@@ -281,9 +280,9 @@ export default function Page() {
                                                 <span>Horas Total: {(area.horas.trabajadas + area.horas.extras).toFixed(1)}h</span>
                                             </div>
                                             <div className="w-full h-3 flex rounded-full overflow-hidden bg-gray-100">
-                                                <div className="bg-blue-500 h-full" style={{width: `${(area.horas.trabajadas / 40) * 100}%`}} title="Trabajadas"></div>
-                                                <div className="bg-yellow-400 h-full" style={{width: `${(area.horas.descansos / 40) * 100}%`}} title="Descanso"></div>
-                                                <div className="bg-purple-500 h-full" style={{width: `${(area.horas.extras / 40) * 100}%`}} title="Extras"></div>
+                                                <div className="bg-blue-500 h-full" style={{ width: `${(area.horas.trabajadas / 40) * 100}%` }} title="Trabajadas"></div>
+                                                <div className="bg-yellow-400 h-full" style={{ width: `${(area.horas.descansos / 40) * 100}%` }} title="Descanso"></div>
+                                                <div className="bg-purple-500 h-full" style={{ width: `${(area.horas.extras / 40) * 100}%` }} title="Extras"></div>
                                             </div>
                                             <div className="flex gap-3 mt-2">
                                                 <div className="flex items-center gap-1 text-xs text-gray-500"><div className="w-2 h-2 bg-blue-500 rounded-full"></div>Reg</div>
@@ -323,7 +322,7 @@ export default function Page() {
                                 .filter(a => colaboradores.some(c => c.estado === filtro && c.area === a.nombre))
                                 .map((a) => (
                                     <div key={a.nombre} className="mb-4">
-                                        <div 
+                                        <div
                                             onClick={() => toggleColaboradores(a.nombre)}
                                             className="flex items-center justify-between p-2 rounded-md hover:bg-gray-50 cursor-pointer group"
                                         >
@@ -337,10 +336,9 @@ export default function Page() {
                                                 .filter(c => c.estado === filtro && c.area === a.nombre)
                                                 .map((c) => (
                                                     <div key={c.nombre} className="flex items-center gap-2 p-1.5 rounded text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
-                                                        <div className={`w-2 h-2 rounded-full ${
-                                                            c.estado === 'dentro' ? 'bg-green-500' : 
-                                                            c.estado === 'descanso' ? 'bg-yellow-500' : 'bg-gray-300'
-                                                        }`}></div>
+                                                        <div className={`w-2 h-2 rounded-full ${c.estado === 'dentro' ? 'bg-green-500' :
+                                                                c.estado === 'descanso' ? 'bg-yellow-500' : 'bg-gray-300'
+                                                            }`}></div>
                                                         {c.nombre}
                                                     </div>
                                                 ))}
@@ -357,13 +355,13 @@ export default function Page() {
                     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
                         <div className="bg-white rounded-xl shadow-2xl p-6 w-[600px] max-w-[90%] relative animate-in fade-in zoom-in duration-200">
                             <button onClick={closePopup} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500">✕</button>
-                            
+
                             <h3 className="text-xl font-bold mb-6 text-gray-800 border-b pb-2">Detalle: {popupArea}</h3>
-                            
+
                             {(() => {
                                 const area = areas.find(a => a.nombre === popupArea)
                                 if (!area) return null
-                                
+
                                 const proyectosCompletados = proyectos.filter(p => area.proyecto.includes(p.nombre) && p.estado == "Completado").length
                                 const proyectosEnProceso = proyectos.filter(p => area.proyecto.includes(p.nombre) && p.estado == "En progreso").length
                                 const proyectosPendientes = proyectos.filter(p => area.proyecto.includes(p.nombre) && p.estado == "Pendiente").length
@@ -373,7 +371,7 @@ export default function Page() {
                                     <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                                         <div className='bg-gray-50 rounded-lg p-4 h-full'>
                                             <h4 className="text-xs font-bold text-gray-400 uppercase mb-3">Proyectos Asignados</h4>
-                                            {area.proyecto.map((p) =>(
+                                            {area.proyecto.map((p) => (
                                                 <div key={p} className='flex items-center justify-between mb-2 bg-white p-2 rounded border border-gray-100 shadow-sm'>
                                                     <span className='text-sm font-medium text-gray-700 truncate max-w-[120px]'>{p}</span>
                                                     <span className={`text-[10px] px-2 py-0.5 rounded-full ${getStatusColor(proyectos.find(proj => proj.nombre === p)?.estado || '')}`}>
@@ -383,7 +381,7 @@ export default function Page() {
                                             ))}
                                         </div>
                                         <div className="flex flex-col items-center justify-center bg-gray-50 rounded-lg p-4">
-                                             <div className="relative w-32 h-32">
+                                            <div className="relative w-32 h-32">
                                                 <svg className="w-full h-full" viewBox="0 0 160 160">
                                                     <circle cx="80" cy="80" r="60" stroke="#e5e7eb" strokeWidth="12" fill="none" />
                                                     <circle cx="80" cy="80" r="60" stroke="#22c55e" strokeWidth="12" fill="none"
@@ -394,8 +392,8 @@ export default function Page() {
                                                     <span className="text-2xl font-bold text-gray-800">{totalProyectos}</span>
                                                     <span className="text-[10px] text-gray-500 uppercase">Proyectos</span>
                                                 </div>
-                                             </div>
-                                             <div className="mt-4 w-full space-y-1 text-xs">
+                                            </div>
+                                            <div className="mt-4 w-full space-y-1 text-xs">
                                                 <div className="flex justify-between"><span>Completados</span><span className="font-bold">{proyectosCompletados}</span></div>
                                                 <div className="flex justify-between"><span>En Curso</span><span className="font-bold">{proyectosEnProceso}</span></div>
                                             </div>

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import 'leaflet/dist/leaflet.css';
 import "../app/globals.css";
+import { WorkSessionProvider } from "@/app/(admin)/-componentes/WorkSessionContext";
+import WorkWidget from "@/components/workwidget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +30,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        {/* 1. Envuelve todo el contenido con el Provider */}
+        <WorkSessionProvider>
+          
+          {/* El contenido de tus páginas */}
+          {children}
+          
+          {/* 2. Agrega el Widget aquí para que flote sobre cualquier página */}
+          <WorkWidget />
+          
+        </WorkSessionProvider>
       </body>
     </html>
   );

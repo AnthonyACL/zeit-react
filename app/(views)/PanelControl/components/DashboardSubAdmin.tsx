@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Users, 
   Trophy, 
@@ -17,6 +18,7 @@ import {
 import { MOCK_COLABORADORES, MOCK_AREAS, MOCK_PROYECTOS, MOCK_PROYECTOS_ESTADISTICAS } from '@/data/mockData';
 
 export default function DashboardSubjefe() {
+    const router = useRouter();
     
     // --- ESTADO: Selector de Grupo ---
     const [grupoSeleccionado, setGrupoSeleccionado] = useState('Todos');
@@ -275,7 +277,7 @@ export default function DashboardSubjefe() {
                             ))}
                         </div>
                         <div className="p-3 bg-gray-50 text-center border-t border-gray-100">
-                            <button className="text-xs text-gray-500 hover:text-indigo-600 font-medium flex items-center justify-center gap-1 mx-auto">
+                            <button onClick={() => router.push('/Proyectos')} className="text-xs text-gray-500 hover:text-indigo-600 font-medium flex items-center justify-center gap-1 mx-auto">
                                 Ver calendario completo <ChevronRight size={12}/>
                             </button>
                         </div>
@@ -348,9 +350,6 @@ export default function DashboardSubjefe() {
                                 </div>
                             ))}
                         </div>
-                        <button className="w-full mt-5 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
-                            Redistribuir Tareas
-                        </button>
                     </div>
 
                 </div>

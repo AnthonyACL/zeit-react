@@ -186,10 +186,10 @@ export default function Page() {
                     <span className="font-bold text-2xl">Panel de control</span>
                 </div>
                 <div className=' m-10'>
-                    {currentUser?.role === 'Admin' && <DashboardAdmin />}
-                    {currentUser?.role === 'SubAdmin' && <DashboardSubAdmin />}
-                    {currentUser?.role === 'Moderator' && <DashboardModerator />}
-                    {(currentUser?.role === 'Collaborator' || !currentUser) && <DashboardColaborator />}
+                    {currentUser?.rol === 'Admin' && <DashboardAdmin />}
+                    {currentUser?.rol === 'SubAdmin' && <DashboardSubAdmin />}
+                    {currentUser?.rol === 'Moderator' && <DashboardModerator />}
+                    {(currentUser?.rol === 'Collaborator' || !currentUser) && <DashboardColaborator />}
                 </div>
             </SidebarInset>
         </SidebarProvider>

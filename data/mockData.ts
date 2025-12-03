@@ -19,6 +19,8 @@ export interface Proyecto {
   avance: number;
   manager: string;
   area: string;
+  recurso?: string;
+  fechaEntrega?: string;
 }
 
 export interface ProyectoDetallado {
@@ -187,11 +189,11 @@ export const MOCK_USERS: User[] = [
 
 // 5. Mock Data: Proyectos (5 proyectos, uno por área)
 export const MOCK_PROYECTOS: Proyecto[] = [
-  { id: 1, nombre: 'Plataforma Ventas Online', estado: 'En progreso', avance: 70, manager: 'Carlos Ventas', area: 'Ventas' },
-  { id: 2, nombre: 'Sistema Gestión RR.HH', estado: 'En progreso', avance: 85, manager: 'Marta RRHH', area: 'RRHH' },
-  { id: 3, nombre: 'Dashboard Analytics', estado: 'En progreso', avance: 65, manager: 'Juan Análisis', area: 'Análisis' },
-  { id: 4, nombre: 'App React Admin', estado: 'En progreso', avance: 80, manager: 'Diego React', area: 'Desarrollo React' },
-  { id: 5, nombre: 'API Laravel REST', estado: 'Completado', avance: 100, manager: 'Pedro Laravel', area: 'Desarrollo Laravel' }
+  { id: 1, nombre: 'Plataforma Ventas Online', estado: 'En progreso', avance: 70, manager: 'Carlos Ventas', area: 'Ventas', recurso: 'https://shopify.com', fechaEntrega: '2025-12-15' },
+  { id: 2, nombre: 'Sistema Gestión RR.HH', estado: 'En progreso', avance: 85, manager: 'Marta RRHH', area: 'RRHH', recurso: 'https://successfactors.com', fechaEntrega: '2026-01-20' },
+  { id: 3, nombre: 'Dashboard Analytics', estado: 'En progreso', avance: 65, manager: 'Juan Análisis', area: 'Análisis', recurso: 'https://tableau.com', fechaEntrega: '2025-11-30' },
+  { id: 4, nombre: 'App React Admin', estado: 'En progreso', avance: 80, manager: 'Diego React', area: 'Desarrollo React', recurso: 'https://nextjs.org', fechaEntrega: '2026-02-10' },
+  { id: 5, nombre: 'API Laravel REST', estado: 'Completado', avance: 100, manager: 'Pedro Laravel', area: 'Desarrollo Laravel', recurso: 'https://laravel.com', fechaEntrega: '2025-10-10' }
 ];
 
 // 6. Mock Data: KPI

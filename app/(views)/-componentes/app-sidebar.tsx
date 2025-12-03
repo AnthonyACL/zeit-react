@@ -41,10 +41,10 @@ const navByRole = {
 type UserRole = keyof typeof navByRole;
 
 const defaultUser = {
-  name: "Diego Alonso",
+  nombre: "Diego Alonso",
   email: "diego@hello.com",
-  avatar: "/avatars/diego.jpg",
-  role: "Collaborator",
+  avatar: "https://i.pravatar.cc/150?u=diego",
+  rol: "Collaborator",
 };
 
 // --- 3. COMPONENTE PRINCIPAL ---
@@ -66,7 +66,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
   }, []);
   
-  const userRole = (currentUser.role || 'Collaborator') as UserRole;
+  const userRole = (currentUser.rol || 'Collaborator') as UserRole;
   const rawNavItems = navByRole[userRole] || [];
   const filteredNavItems = rawNavItems.map(item => ({
     ...item,
@@ -85,7 +85,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter className="p-3">
         <Link href="/MiPerfil" className="w-full block">
-            <NavUser user={currentUser} />
+            <NavUser user={{
+              nombre: currentUser.nombre || 'Usuario',
+              email: currentUser.email || 'usuario@test.com',
+              rol: currentUser.rol || 'Collaborator',
+              avatar: currentUser.avatar,
+            }} />
         </Link>
       </SidebarFooter>
       

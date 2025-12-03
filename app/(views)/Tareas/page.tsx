@@ -220,6 +220,42 @@ export default function TareasPage() {
     );
   };
 
+  const handleAnularTarea = (tareaId: string) => {
+    if (!currentUser || (currentUser.rol !== 'Moderator' && currentUser.rol !== 'SubAdmin' && currentUser.rol !== 'Admin')) {
+      alert('Solo moderadores pueden anular tareas');
+      return;
+    }
+
+    if (confirm('¿Estás seguro que deseas anular esta tarea y regresarla a "En proceso"?')) {
+      const tarea = tareas.find((t) => t.id === tareaId);
+      if (tarea) {
+        const tareaActualizada: Tarea = {
+          ...tarea,
+          estado: 'en_proceso',
+          review: undefined,
+          submission: undefined,
+        };
+
+        setTareas(tareas.map((t) => (t.id === tareaId ? tareaActualizada : t)));
+        if (tareaActual?.id === tareaId) {
+          setTareaActual(tareaActualizada);
+        }
+      }
+    }
+  };
+
+  const handleStartTask = () => {
+    if (!tareaActual || currentUser?.rol !== 'Collaborator') return;
+
+    const tareaActualizada: Tarea = {
+      ...tareaActual,
+      estado: 'en_proceso',
+    };
+
+    setTareas(tareas.map((t) => (t.id === tareaActual.id ? tareaActualizada : t)));
+    setTareaActual(tareaActualizada);
+  };
+
   if (!currentUser) {
     return (
       <SidebarProvider>
@@ -271,7 +307,7 @@ export default function TareasPage() {
         {/* Header*/}
         <div className="bg-white w-full h-[80px] flex items-center justify-between px-8 shadow-sm mb-8">
           <span className="font-bold" style={{ fontSize: 27 }}>{userArea.nombre}</span>
-          <span className="text-sm text-gray-600">({currentUser.rol})</span>
+          {/* <span className="text-sm text-gray-600">({currentUser.rol})</span> */}
         </div>
         <div className="p-8">
           {/* Título del Proyecto */}
@@ -320,30 +356,6 @@ export default function TareasPage() {
                               />
                             )}
                           </div>
-                          {(currentUser.rol === 'Moderator' || currentUser.rol === 'SubAdmin' || currentUser.rol === 'Admin') && (
-                            <div className="flex gap-2 mt-3 pt-3 border-t">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleMarkComplete(tarea.id);
-                                }}
-                                className="text-green-600 hover:text-green-700 flex-1 text-xs"
-                                title="Marcar como completada"
-                              >
-                                <CheckCircle size={16} className="mx-auto" />
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEliminar(tarea.id);
-                                }}
-                                className="text-red-600 hover:text-red-700 flex-1 text-xs"
-                                title="Eliminar tarea"
-                              >
-                                <Trash2 size={16} className="mx-auto" />
-                              </button>
-                            </div>
-                          )}
                         </div>
                       ))}
                   </div>
@@ -367,7 +379,19 @@ export default function TareasPage() {
                   rol: currentUser.rol,
                 }}
                 onEdit={() => (currentUser.rol === 'Moderator' || currentUser.rol === 'SubAdmin' || currentUser.rol === 'Admin') && setModo('editar')}
+                onMarkComplete={handleMarkComplete}
+                onDelete={handleEliminar}
+                onAnular={handleAnularTarea}
               />
+
+              {currentUser.rol === 'Collaborator' && tareaActual.colaboradores.includes(currentUserId!) && tareaActual.estado === 'asignada' && (
+                <button
+                  onClick={() => handleStartTask()}
+                  className="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 font-semibold"
+                >
+                  Empezar tarea
+                </button>
+              )}
 
               {currentUser.rol === 'Collaborator' && tareaActual.colaboradores.includes(currentUserId!) && tareaActual.estado === 'en_proceso' && !tareaActual.submission && (
                 <button

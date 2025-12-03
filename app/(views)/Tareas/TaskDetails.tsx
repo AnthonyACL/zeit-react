@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { Tarea, MOCK_COLABORADORES } from '@/data/mockData';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
 type Colaborador = {
   id: number;
@@ -21,9 +21,12 @@ type Props = {
   colaboradores: Colaborador[];
   currentUser: CurrentUser;
   onEdit: () => void;
+  onMarkComplete?: (tareaId: string) => void;
+  onDelete?: (tareaId: string) => void;
+  onAnular?: (tareaId: string) => void;
 };
 
-export default function TaskDetails({ tarea, colaboradores, currentUser, onEdit }: Props) {
+export default function TaskDetails({ tarea, colaboradores, currentUser, onEdit, onMarkComplete, onDelete, onAnular }: Props) {
   const getEstadoColor = (estado: string) => {
     switch (estado) {
       case 'no_asignada':
@@ -158,14 +161,46 @@ export default function TaskDetails({ tarea, colaboradores, currentUser, onEdit 
       )}
 
       {/* Action Buttons */}
-      <div className="flex gap-2 mt-6">
+      <div className="flex gap-2 mt-6 flex-wrap">
         {(currentUser.rol === 'Moderator' || currentUser.rol === 'SubAdmin' || currentUser.rol === 'Admin') && (
-          <button
-            onClick={onEdit}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded font-semibold"
-          >
-            Editar tarea
-          </button>
+          <>
+            <button
+              onClick={onEdit}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded font-semibold"
+            >
+              Editar tarea
+            </button>
+
+            {/* Botones solo para estado "por_revisar" */}
+            {tarea.estado === 'por_revisar' && onMarkComplete && onDelete && (
+              <>
+                <button
+                  onClick={() => onMarkComplete(tarea.id)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-semibold flex items-center gap-2"
+                >
+                  <CheckCircle size={18} />
+                  Marcar como completada
+                </button>
+                <button
+                  onClick={() => onDelete(tarea.id)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-semibold"
+                >
+                  Eliminar tarea
+                </button>
+              </>
+            )}
+
+            {/* Botón para estado "completada" - Anular/Regresar */}
+            {tarea.estado === 'completada' && onAnular && (
+              <button
+                onClick={() => onAnular(tarea.id)}
+                className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded font-semibold flex items-center gap-2"
+              >
+                <AlertCircle size={18} />
+                Anular tarea
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>

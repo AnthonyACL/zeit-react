@@ -31,17 +31,19 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'form'>)
 
       console.log('✅ Login exitoso:', user);
 
-      // Obtener datos del colaborador
+      // Obtener datos del colaborador desde MOCK_COLABORADORES
       const colaborador = MOCK_COLABORADORES.find(c => c.correo === email);
-      
-      // Guardar datos en localStorage
+
+      // Guardar usuario en localStorage con el rol correctamente mapeado
       localStorage.setItem('currentUser', JSON.stringify({
-        ...user,
-        nombre: colaborador?.nombre,
-        avatar: colaborador?.avatar
+        id: user.id,
+        email: user.email,
+        rol: user.role,  // Convertir 'role' a 'rol' para consistency
+        nombre: colaborador?.nombre || email,
+        area: colaborador?.area,
       }));
 
-      // LÓGICA DE REDIRECCIÓN POR ROL
+      // LÓGICA DE REDIRECCIÓN POR ROL (todos van a PanelControl)
       router.push('/PanelControl');
 
     } catch (err: any) {

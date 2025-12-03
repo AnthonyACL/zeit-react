@@ -75,11 +75,13 @@ export default function Page() {
         areaMembers.includes(c.id)
       );
     } else if (currentUserData.rol === 'Collaborator') {
-      // Collaborator puede hablar con su jefe del área y otros en su área
+      // Collaborator puede hablar con su jefe del área, otros en su área y con RRHH
       const userArea = MOCK_AREAS.find(a => a.nombre === currentUserData.area);
       const areaMembers = userArea?.collaborators || [];
       
-      return filtered.filter(c => areaMembers.includes(c.id));
+      return filtered.filter(c => 
+        areaMembers.includes(c.id) || c.area === 'RRHH'
+      );
     }
 
     return filtered;
@@ -366,7 +368,6 @@ export default function Page() {
                     <p><strong>Institución:</strong> {selectedUser.institucion}</p>
                     <p><strong>Correo:</strong> {selectedUser.correo}</p>
                     <p><strong>Teléfono:</strong> {selectedUser.telefono}</p>
-                    <p><strong>DNI:</strong> {selectedUser.dni}</p>
                   </>
                 )}
               </div>

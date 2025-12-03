@@ -3,11 +3,11 @@
 import { useState, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 
-import { AppSidebar } from '@/app/(admin)/-componentes/app-sidebar';
+import { AppSidebar } from '@/app/(views)/-componentes/app-sidebar';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 
 // Importa el mapa dinámicamente SIN SSR
-const Mapa = dynamic(() => import('@/app/(admin)/-componentes/map'), {
+const Mapa = dynamic(() => import('@/app/(views)/-componentes/map'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full flex items-center justify-center bg-gray-100">

@@ -1,135 +1,68 @@
 "use client"
-import React, { useState } from 'react';
-// [CAMBIO] Importamos el ícono de basura
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Search, Edit2, ChevronDown, Plus, Trash2 } from 'lucide-react';
-import { AppSidebar } from '@/app/(admin)/-componentes/app-sidebar'
+import { AppSidebar } from '@/app/(views)/-componentes/app-sidebar'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { MOCK_COLABORADORES, MOCK_CARGOS, MOCK_ROLES, MOCK_AREAS, MOCK_INSTITUCIONES, Colaborador, UserRole } from '@/data/mockData';
 
 export default function Page() {
-  const [colaboradores, setColaboradores] = useState([
-    // ... (tus colaboradores se mantienen igual) ...
-    {
-      id: 1,
-      nombre: 'Diego Alonso',
-      dni: '',
-      correo: 'dialollp@gmail.com',
-      telefono: '997472680',
-      usuario: 'diego_uwu',
-      contraseña: 'admin123',
-      cargo: 'Colaborador',
-      area: 'Desarrollo React',
-      institucion: 'SENATI'
-    },
-    {
-      id: 2,
-      nombre: 'Manuel Echeverria',
-      dni: '',
-      correo: 'manuel@gmail.com',
-      telefono: '995368680',
-      usuario: 'manuel_m',
-      contraseña: 'pass123',
-      cargo: 'Asesor de Ventas',
-      area: 'Desarrollo Angular',
-      institucion: 'SENATI'
-    },
-    {
-      id: 3,
-      nombre: 'Oscar Arias',
-      dni: '',
-      correo: 'oscar@gmail.com',
-      telefono: '925368690',
-      usuario: 'oscar_a',
-      contraseña: 'pass456',
-      cargo: 'Jefe de Area',
-      area: 'Desarrollo Python',
-      institucion: 'SENATI'
-    },
-    {
-      id: 4,
-      nombre: 'Andrea Santiesteban',
-      dni: '',
-      correo: 'andrea@gmail.com',
-      telefono: '927658620',
-      usuario: 'andrea_s',
-      contraseña: 'pass789',
-      cargo: 'RRHH',
-      area: 'Desarrollo Vue.js',
-      institucion: 'SENATI'
-    },
-    {
-      id: 5,
-      nombre: 'Marcelo Scerpella',
-      dni: '',
-      correo: 'marcelo@gmail.com',
-      telefono: '927876640',
-      usuario: 'marcelo_s',
-      contraseña: 'pass321',
-      cargo: 'Colaborador',
-      area: 'Desarrollo React',
-      institucion: 'UPC'
-    },
-  ]);
+  const searchParams = useSearchParams();
+  const [colaboradores, setColaboradores] = useState<Colaborador[]>(MOCK_COLABORADORES);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
-  const cargosOptions = [ 'RRHH', 'Asesor de Ventas', 'Jefe de Area', 'Colaborador'];
-  const areasOptions = [
-    'Desarrollo React',
-    'Desarrollo Angular',
-    'Desarrollo Vue.js',
-    'Desarrollo Python',
-    'Desarrollo Java',
-    'Desarrollo .NET',
-    'Desarrollo Node.js',
-    'Desarrollo PHP',
-    'Desarrollo Mobile (Android)',
-    'Desarrollo Mobile (iOS)',
-    'Desarrollo Flutter',
-    'Data Science',
-    'Machine Learning',
-    'DevOps',
-    'Cloud Computing',
-    'Ciberseguridad',
-    'UI/UX Design',
-    'QA Testing'
-  ];
-  const institucionesOptions = [
-    'SENATI',
-    'TECSUP',
-    'UPC - Universidad Peruana de Ciencias Aplicadas',
-    'PUCP - Pontificia Universidad Católica del Perú',
-    'UNMSM - Universidad Nacional Mayor de San Marcos',
-    'UNI - Universidad Nacional de Ingeniería',
-    'USIL - Universidad San Ignacio de Loyola',
-    'UPN - Universidad Privada del Norte',
-    'UTEC - Universidad de Ingeniería y Tecnología',
-    'ULIMA - Universidad de Lima',
-    'USMP - Universidad de San Martín de Porres',
-    'UAP - Universidad Alas Peruanas',
-    'UTP - Universidad Tecnológica del Perú',
-    'UCSUR - Universidad Científica del Sur',
-    'UNSA - Universidad Nacional de San Agustín',
-    'UNT - Universidad Nacional de Trujillo',
-    'UPAO - Universidad Privada Antenor Orrego',
-    'UNFV - Universidad Nacional Federico Villarreal',
-    'IDAT - Instituto de Educación Superior Tecnológico Privado',
-    'CIBERTEC',
-    'CERTUS',
-    'ISIL - Instituto San Ignacio de Loyola'
-  ];
-  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const user = localStorage.getItem('currentUser');
+      if (user) setCurrentUser(JSON.parse(user));
+    }
+  }, []);
+
+  // Leer el parámetro 'area' de la URL y preseleccionar el filtro
   const [filtroArea, setFiltroArea] = useState<string>('todos');
+  
+  useEffect(() => {
+    const areaParam = searchParams.get('area');
+    if (areaParam) {
+      setFiltroArea(decodeURIComponent(areaParam));
+    }
+  }, [searchParams]);
+
+  // Determinar qué roles puede crear el usuario actual
+  const getAvailableRoles = (): UserRole[] => {
+    switch (currentUser?.role) {
+      case 'Admin':
+        return ['SubAdmin', 'Moderator', 'Collaborator'];
+      case 'SubAdmin':
+        return ['Moderator', 'Collaborator'];
+      case 'Moderator':
+        return ['Collaborator'];
+      case 'Collaborator':
+        return [];
+      default:
+        return ['Collaborator'];
+    }
+  };
+
+  const availableRoles = getAvailableRoles();
+
+  const cargosOptions = MOCK_CARGOS;
+  const rolesOptions = availableRoles;
+  const areasOptions = MOCK_AREAS.map(area => area.nombre);
+  const institucionesOptions = MOCK_INSTITUCIONES;
+  
   const [searchColaboradores, setSearchColaboradores] = useState(""); 
   
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [selectedColaborador, setSelectedColaborador] = useState<any>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Omit<Colaborador, 'id'>>({
     nombre: '',
     dni: '',
     correo: '',
     telefono: '',
-    usuario: '',
-    contraseña: '',
     cargo: '',
+    rol: 'Collaborator',
     area: '',
     institucion: ''
   });
@@ -140,21 +73,20 @@ export default function Page() {
   const [showAreaDropdown, setShowAreaDropdown] = useState(false);
   const [showInstitucionDropdown, setShowInstitucionDropdown] = useState(false);
   const [showCargoDropdown, setShowCargoDropdown] = useState(false);
+  const [showRolDropdown, setShowRolDropdown] = useState(false);
 
   // [NUEVO] Estados para el modal de eliminación
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [colaboradorToDelete, setColaboradorToDelete] = useState<any>(null);
   
   const resetForm = () => {
-    // ... (función sin cambios)
     setFormData({
       nombre: '',
       dni: '',
       correo: '',
       telefono: '',
-      usuario: '',
-      contraseña: '',
       cargo: '',
+      rol: 'Collaborator',
       area: '',
       institucion: ''
     });
@@ -171,31 +103,28 @@ export default function Page() {
     setModalOpen(true);
   };
 
-  const handleEdit = (colaborador: any) => {
-    // ... (función sin cambios)
+  const handleEdit = (colaborador: Colaborador) => {
     setSelectedColaborador(colaborador);
     setFormData({ ...colaborador });
     setAreaSearch(colaborador.area || '');
     setInstitucionSearch(colaborador.institucion || '');
-    setSelectedAreas(colaborador.areas ? [...colaborador.areas] : (colaborador.area ? [colaborador.area] : []));
+    setSelectedAreas(colaborador.area ? [colaborador.area] : []);
     setModalMode('edit');
     setModalOpen(true);
   };
 
   const handleSubmit = () => {
-    // ... (función sin cambios)
     if (modalMode === 'add') {
-      const newColaborador = {
+      const newColaborador: Colaborador = {
         ...formData,
         id: colaboradores.length + 1,
-        areas: selectedAreas.length ? selectedAreas : (formData.area ? [formData.area] : []),
-        area: selectedAreas.length ? selectedAreas[0] : formData.area,
+        rol: formData.rol as UserRole,
       };
       setColaboradores([...colaboradores, newColaborador]);
-    } else {
+    } else if (selectedColaborador) {
       setColaboradores(
         colaboradores.map((col) =>
-          col.id === selectedColaborador?.id ? { ...formData, id: col.id, areas: selectedAreas.length ? selectedAreas : (formData.area ? [formData.area] : []), area: selectedAreas.length ? selectedAreas[0] : formData.area } : col
+          col.id === selectedColaborador.id ? { ...formData, id: col.id, rol: formData.rol as UserRole } : col
         ));
     }
     setModalOpen(false);
@@ -253,7 +182,7 @@ export default function Page() {
   };
 
   // [NUEVO] Abrir modal de confirmación de borrado
-  const handleDeleteClick = (colaborador: any) => {
+  const handleDeleteClick = (colaborador: Colaborador) => {
     setColaboradorToDelete(colaborador);
     setDeleteModalOpen(true);
   };
@@ -274,8 +203,8 @@ export default function Page() {
     handleCancelDelete(); // Cierra el modal y resetea el estado
   };
 
-  const filteredAreas = areasOptions.filter((area) =>
-    area.toLowerCase().includes(areaSearch.toLowerCase())
+  const filteredAreas = areasOptions.filter((areaName) =>
+    areaName.toLowerCase().includes(areaSearch.toLowerCase())
   );
 
   const filteredColaboradores = colaboradores.filter(
@@ -380,7 +309,7 @@ export default function Page() {
                           </div>
                           <div>
                             <div className="font-medium text-gray-900">{colaborador.nombre}</div>
-                            <div className="text-sm text-gray-500">{colaborador.cargo}</div>
+                            <div className="text-sm text-gray-500">{colaborador.rol}</div>
                           </div>
                         </div>
                       </td>
@@ -498,19 +427,6 @@ export default function Page() {
                     className="flex-1 border px-4 py-2 rounded-lg"
                   />
                 </div>
-                <div className="flex items-center gap-4">
-                  <label className="w-40 text-right text-gray-700">
-                    Usuario
-                  </label>
-                  <input
-                    type="text"
-                    name="usuario"
-                    value={formData.usuario}
-                    onChange={handleInputChange}
-                    placeholder="Ingrese el usuario"
-                    className="flex-1 border px-4 py-2 rounded-lg"
-                  />
-                </div>
                 {/* Cargo con dropdown */}
                 <div className="flex items-center gap-4">
                   <label className="w-40 text-right text-gray-700">Cargo</label>
@@ -539,6 +455,49 @@ export default function Page() {
                             className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
                           >
                             {cargo}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* Rol con dropdown */}
+                <div className="flex items-center gap-4">
+                  <label className="w-40 text-right text-gray-700">Rol</label>
+                  <div className="flex-1 relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowRolDropdown(!showRolDropdown)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between text-left"
+                      disabled={availableRoles.length === 0}
+                    >
+                      <span
+                        className={
+                          formData.rol ? "text-gray-900" : "text-gray-400"
+                        }
+                      >
+                        {formData.rol || "Seleccione el rol"}
+                      </span>
+                      <ChevronDown size={20} className="text-gray-400" />
+                    </button>
+                    {availableRoles.length === 0 && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        No tienes permisos para crear colaboradores con otros roles.
+                      </div>
+                    )}
+                    {showRolDropdown && availableRoles.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {availableRoles.map((role) => (
+                          <button
+                            key={role}
+                            type="button"
+                            onClick={() => {
+                              setFormData((prev) => ({ ...prev, rol: role }));
+                              setShowRolDropdown(false);
+                            }}
+                            className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
+                          >
+                            {role}
                           </button>
                         ))}
                       </div>

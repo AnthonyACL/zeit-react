@@ -2,8 +2,9 @@
 
 import React, { useState, useMemo } from 'react';
 import { Search, Edit2, User, Clock, X } from 'lucide-react';
-import { AppSidebar } from '@/app/(admin)/-componentes/app-sidebar'
+import { AppSidebar } from '@/app/(views)/-componentes/app-sidebar'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { MOCK_COLABORADORES } from '@/data/mockData'
 
 export default function Page() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,6 +19,7 @@ export default function Page() {
     id: number;
     name: string;
     role: string;
+    userRole: string;
     areas: string[];
     area: string; 
     schedule: Record<DayKey, DaySchedule>;
@@ -27,104 +29,26 @@ export default function Page() {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
 
-  const [schedules, setSchedules] = useState<Person[]>([
-    {
-      id: 1,
-      name: 'Diego Alonso',
-      role: 'Android - Analisis',
-      areas: ['Android - Analisis', 'Operaciones'],
-      area: 'Android - Analisis',
-      schedule: {
-        L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        Mi: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        J: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        V: { start: '9:00 am', end: '12:30 pm', type: 'Presencial' },
+  // Convertir MOCK_COLABORADORES al formato de schedules
+  const [schedules, setSchedules] = useState<Person[]>(
+    MOCK_COLABORADORES.map(col => ({
+      id: col.id,
+      name: col.nombre,
+      role: col.cargo,
+      userRole: col.rol,
+      areas: [col.area],
+      area: col.area,
+      schedule: (col.schedule || {
+        L: { type: 'Descanso' },
+        M: { type: 'Descanso' },
+        Mi: { type: 'Descanso' },
+        J: { type: 'Descanso' },
+        V: { type: 'Descanso' },
         S: { type: 'Descanso' },
         D: { type: 'Descanso' }
-      }
-    },
-    {
-      id: 2,
-      name: 'Manuel Echeverria',
-      role: 'Android - Analisis',
-      areas: ['Android - Analisis'],
-      area: 'Android - Analisis',
-      schedule: {
-        L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        Mi: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        J: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        V: { start: '9:00 am', end: '12:30 pm', type: 'Presencial' },
-        S: { type: 'Descanso' },
-        D: { type: 'Descanso' }
-      }
-    },
-    {
-      id: 3,
-      name: 'Oscar Arias',
-      role: 'Android - Analisis',
-      areas: ['Android - Analisis'],
-      area: 'Android - Analisis',
-      schedule: {
-        L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        Mi: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        J: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        V: { start: '9:00 am', end: '12:30 pm', type: 'Presencial' },
-        S: { type: 'Descanso' },
-        D: { type: 'Descanso' }
-      }
-    },
-    {
-      id: 4,
-      name: 'Andrea Santiesteban',
-      role: 'Android - Analisis',
-      areas: ['Android - Analisis'],
-      area: 'Android - Analisis',
-      schedule: {
-        L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        Mi: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        J: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        V: { start: '9:00 am', end: '12:30 pm', type: 'Presencial' },
-        S: { type: 'Descanso' },
-        D: { type: 'Descanso' }
-      }
-    },
-    {
-      id: 5,
-      name: 'Marcelo Scerpella',
-      role: 'Android - Analisis',
-      areas: ['Android - Analisis'],
-      area: 'Android - Analisis',
-      schedule: {
-        L: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        M: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        Mi: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        J: { start: '8:00 am', end: '5:00 pm', type: 'Virtual' },
-        V: { start: '9:00 am', end: '12:30 pm', type: 'Presencial' },
-        S: { type: 'Descanso' },
-        D: { type: 'Descanso' }
-      }
-    },
-    {
-      id: 6,
-      name: 'Carla Rodriguez',
-      role: 'Diseñadora Gráfica',
-      areas: ['Marketing', 'Diseño'],
-      area: 'Marketing',
-      schedule: {
-        L: { start: '9:00 am', end: '6:00 pm', type: 'Presencial' },
-        M: { start: '9:00 am', end: '6:00 pm', type: 'Presencial' },
-        Mi: { start: '9:00 am', end: '6:00 pm', type: 'Virtual' },
-        J: { start: '9:00 am', end: '6:00 pm', type: 'Presencial' },
-        V: { start: '9:00 am', end: '6:00 pm', type: 'Virtual' },
-        S: { type: 'Descanso' },
-        D: { type: 'Descanso' }
-      }
-    }
-  ]);
+      }) as Record<DayKey, DaySchedule>
+    }))
+  );
 
   const dayLabels: DayKey[] = ['L', 'M', 'Mi', 'J', 'V', 'S', 'D'];
   const dayNames = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
@@ -312,6 +236,7 @@ export default function Page() {
                           </div>
                           <div>
                             <div className="font-medium text-gray-900">{person.name}</div>
+                            <div className="text-sm text-gray-600 font-medium">{person.userRole}</div>
                             <div className="text-sm text-gray-500">{person.role}</div>
                           </div>
                         </div>

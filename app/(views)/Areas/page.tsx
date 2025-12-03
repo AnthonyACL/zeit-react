@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Clock, Plus, Search, User, Square, CheckSquare, X, Edit2, Trash2 } from "lucide-react";
-import { AppSidebar } from "@/app/(admin)/-componentes/app-sidebar";
+import { AppSidebar } from "@/app/(views)/-componentes/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { MOCK_AREAS, MOCK_COLABORADORES } from "@/data/mockData";
+import type { Area } from "@/data/mockData";
 
 type DayKey = "L" | "M" | "Mi" | "J" | "V" | "S" | "D";
 
@@ -12,13 +15,6 @@ interface TimeSlot {
   end: string;
   v: boolean;
   p: boolean;
-}
-
-interface Colaborador {
-  id: number;
-  name: string;
-  role: string;
-  avatar: string;
 }
 
 interface Schedule {
@@ -37,13 +33,6 @@ interface Schedule {
     domingo: TimeSlot;
   };
 }
-
-const allUsers: Colaborador[] = [
-  { id: 1, name: "Diego Alonso", role: "Administración", avatar: "/avatars/diego.jpg" },
-  { id: 2, name: "Ana Torres", role: "Supervisor", avatar: "/avatars/ana.jpg" },
-  { id: 3, name: "Luis Pérez", role: "Operador", avatar: "/avatars/luis.jpg" },
-  { id: 4, name: "Carla Rodriguez", role: "Diseñadora", avatar: "/avatars/carla.jpg" },
-];
 
 const blankSchedule: Schedule = {
   id: 0,
@@ -83,40 +72,33 @@ const dayKeyToTimeKey: Record<DayKey, keyof Schedule["times"]> = {
 };
 
 export default function Page() {
-  const [schedules, setSchedules] = useState<Schedule[]>([
-    {
-      id: 1,
-      name: "Android - Análisis",
-      teamLeaderId: 1,
-      collaborators: [1, 3],
-      days: { L: true, M: true, Mi: true, J: true, V: true, S: false, D: false },
-      times: {
-        lunes: { start: "08:00", end: "17:00", v: true, p: false },
-        martes: { start: "08:00", end: "17:00", v: true, p: false },
-        miercoles: { start: "08:00", end: "17:00", v: true, p: false },
-        jueves: { start: "08:00", end: "17:00", v: false, p: true },
-        viernes: { start: "09:00", end: "12:30", v: false, p: true },
-        sabado: { start: "08:00", end: "17:00", v: false, p: false },
-        domingo: { start: "08:00", end: "17:00", v: false, p: false },
+  const router = useRouter();
+  const [schedules, setSchedules] = useState<Schedule[]>(
+    MOCK_AREAS.map(area => ({
+      id: area.id,
+      name: area.nombre,
+      teamLeaderId: area.teamLeaderId,
+      collaborators: area.collaborators,
+      days: {
+        L: area.days['lunes'] ?? false,
+        M: area.days['martes'] ?? false,
+        Mi: area.days['miercoles'] ?? false,
+        J: area.days['jueves'] ?? false,
+        V: area.days['viernes'] ?? false,
+        S: area.days['sabado'] ?? false,
+        D: area.days['domingo'] ?? false,
       },
-    },
-    {
-      id: 2,
-      name: "Diseño UI/UX",
-      teamLeaderId: 2,
-      collaborators: [2, 4],
-      days: { L: true, M: true, Mi: true, J: false, V: false, S: true, D: false },
       times: {
-        lunes: { start: "09:00", end: "18:00", v: false, p: true },
-        martes: { start: "09:00", end: "18:00", v: false, p: true },
-        miercoles: { start: "09:00", end: "18:00", v: true, p: false },
-        jueves: { start: "08:00", end: "17:00", v: false, p: false },
-        viernes: { start: "08:00", end: "17:00", v: false, p: false },
-        sabado: { start: "09:00", end: "13:00", v: true, p: false },
-        domingo: { start: "08:00", end: "17:00", v: false, p: false },
+        lunes: area.times['lunes'] || { start: '08:00', end: '17:00', v: false, p: false },
+        martes: area.times['martes'] || { start: '08:00', end: '17:00', v: false, p: false },
+        miercoles: area.times['miercoles'] || { start: '08:00', end: '17:00', v: false, p: false },
+        jueves: area.times['jueves'] || { start: '08:00', end: '17:00', v: false, p: false },
+        viernes: area.times['viernes'] || { start: '08:00', end: '17:00', v: false, p: false },
+        sabado: area.times['sabado'] || { start: '08:00', end: '17:00', v: false, p: false },
+        domingo: area.times['domingo'] || { start: '08:00', end: '17:00', v: false, p: false },
       },
-    },
-  ]);
+    }))
+  );
 
   const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -188,13 +170,47 @@ export default function Page() {
   };
 
   const handleTimeChange = (day: keyof Schedule["times"], field: keyof TimeSlot, value: string | boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      times: {
-        ...prev.times,
-        [day]: { ...prev.times[day], [field]: value },
-      },
-    }));
+    setFormData((prev) => {
+      // Si es cambio de modalidad (v o p)
+      if (field === 'v' || field === 'p') {
+        const currentTime = prev.times[day];
+        const isVirtual = field === 'v';
+        const newValue = value as boolean;
+
+        // Si activamos una modalidad, desactivamos la otra
+        if (newValue) {
+          return {
+            ...prev,
+            times: {
+              ...prev.times,
+              [day]: {
+                ...currentTime,
+                [field]: true,
+                [isVirtual ? 'p' : 'v']: false,
+              },
+            },
+          };
+        } else {
+          // Si desactivamos, simplemente desactivar
+          return {
+            ...prev,
+            times: {
+              ...prev.times,
+              [day]: { ...currentTime, [field]: false },
+            },
+          };
+        }
+      } else {
+        // Para otros cambios (start, end)
+        return {
+          ...prev,
+          times: {
+            ...prev.times,
+            [day]: { ...prev.times[day], [field]: value },
+          },
+        };
+      }
+    });
   };
 
   const handleCollaboratorToggle = (id: number) => {
@@ -215,10 +231,19 @@ export default function Page() {
     });
   };
 
+  const handleNavigateToColaboradores = (areaName: string) => {
+    router.push(`/Colaboradores?area=${encodeURIComponent(areaName)}`);
+  };
+
+  // Función para obtener días sin domingo
+  const getWorkDays = (): DayKey[] => {
+    return (Object.keys(dayLabels) as DayKey[]).filter(day => day !== 'D');
+  };
+
   const filteredSchedules = schedules.filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const filteredModalCollaborators = allUsers.filter(user =>
-    user.name.toLowerCase().includes(collaboratorSearch.toLowerCase())
+  const filteredModalCollaborators = MOCK_COLABORADORES.filter(user =>
+    user.nombre.toLowerCase().includes(collaboratorSearch.toLowerCase())
   );
 
   return (
@@ -263,14 +288,18 @@ export default function Page() {
                     <th className="text-left p-4 font-medium text-gray-700">
                       N° Colaboradores
                     </th>
-                    <th className="w-32"></th>
+                    <th className="w-24"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredSchedules.map((schedule) => {
-                    const leader = allUsers.find(u => u.id === schedule.teamLeaderId);
+                    const leader = MOCK_COLABORADORES.find(u => u.id === schedule.teamLeaderId);
                     return (
-                      <tr key={schedule.id} className="border-b hover:bg-gray-50">
+                      <tr 
+                        key={schedule.id} 
+                        className="border-b hover:bg-gray-50 cursor-pointer transition-colors"
+                        onClick={() => handleNavigateToColaboradores(schedule.name)}
+                      >
                         <td className="p-4 font-medium text-gray-900">
                           {schedule.name}
                         </td>
@@ -280,7 +309,7 @@ export default function Page() {
                               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
                                 <User className="w-5 h-5 text-gray-600" />
                               </div>
-                              {leader.name}
+                              {leader.nombre}
                             </div>
                           ) : (
                             <span className="text-gray-400">N/A</span>
@@ -289,8 +318,8 @@ export default function Page() {
                         <td className="p-4 text-gray-700">
                           {schedule.collaborators.length}
                         </td>
-                        <td className="p-4">
-                          <div className="flex items-center gap-3">
+                        <td className="p-4" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleEdit(schedule)}
                               className="text-blue-500 hover:text-blue-700 transition-colors"
@@ -340,7 +369,7 @@ export default function Page() {
               
               <div className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 140px)' }}>
                 {(() => {
-                  const availableLeaders = allUsers.filter(user => formData.collaborators.includes(user.id));
+                  const availableLeaders = MOCK_COLABORADORES.filter(user => formData.collaborators.includes(user.id));
                   
                   return (
                     <>
@@ -371,7 +400,7 @@ export default function Page() {
                                 {availableLeaders.length === 0 ? "-- Añade colaboradores --" : "-- Sin Asignar --"}
                               </option>
                               {availableLeaders.map(user => (
-                                <option key={user.id} value={user.id}>{user.name}</option>
+                                <option key={user.id} value={user.id}>{user.nombre}</option>
                               ))}
                             </select>
                           </div>
@@ -415,8 +444,8 @@ export default function Page() {
                                     <User className="w-6 h-6 text-gray-600" />
                                   </div>
                                   <div>
-                                    <div className="font-medium text-gray-900">{user.name}</div>
-                                    <div className="text-sm text-gray-500">{user.role}</div>
+                                    <div className="font-medium text-gray-900">{user.nombre}</div>
+                                    <div className="text-sm text-gray-500">{user.cargo}</div>
                                   </div>
                                 </button>
                               );
@@ -436,7 +465,7 @@ export default function Page() {
                             Día de la semana
                           </label>
                           <div className="col-span-3 flex gap-2 flex-wrap">
-                            {(Object.keys(dayLabels) as DayKey[]).map((day) => (
+                            {getWorkDays().map((day) => (
                               <button
                                 key={day}
                                 onClick={() => handleDayToggle(day)}
@@ -453,7 +482,7 @@ export default function Page() {
                         </div>
 
                         <div className="space-y-4">
-                          {(Object.keys(dayLabels) as DayKey[]).map((dayKey) => {
+                          {getWorkDays().map((dayKey) => {
                             const label = dayLabels[dayKey];
                             const isDayActive = formData.days[dayKey];
                             const timeKey = dayKeyToTimeKey[dayKey];
@@ -521,7 +550,7 @@ export default function Page() {
                         </div>
                       </div>
                     </>
-                  )
+                  );
                 })()}
               </div>
 

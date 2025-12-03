@@ -1,6 +1,6 @@
 "use client";
 
-import { AppSidebar } from '@/app/(admin)/-componentes/app-sidebar';
+import { AppSidebar } from '@/app/(views)/-componentes/app-sidebar';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';

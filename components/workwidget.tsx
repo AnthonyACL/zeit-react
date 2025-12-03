@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useWorkSession } from '@/app/(admin)/-componentes/WorkSessionContext'; // Asegúrate que la ruta sea correcta
+import { useWorkSession } from '@/app/(views)/-componentes/WorkSessionContext'; // Asegúrate que la ruta sea correcta
 
 // Función para formatear el tiempo
 const formatTime = (totalSeconds: number) => {
@@ -48,7 +48,7 @@ export default function WorkWidget() {
   // Mensaje flotante de éxito
   if (status === 'submitted') {
     return (
-      <div className="fixed top-6 right-6 z-50 animate-bounce">
+      <div className="fixed top-6 right-6 z-5000 animate-bounce">
         <div className="bg-green-500 text-white shadow-xl rounded-full px-6 py-3 flex items-center gap-2">
           <IconCheck />
           <span className="font-bold">¡Enviado!</span>
@@ -60,7 +60,7 @@ export default function WorkWidget() {
   return (
     <div 
       // Aplicamos las clases calculadas
-      className={`fixed top-6 right-6 z-50 overflow-hidden transition-all duration-300 ease-in-out ${getWidgetStyles()}`}
+      className={`fixed top-6 right-6 z-500 overflow-hidden transition-all duration-300 ease-in-out ${getWidgetStyles()}`}
       onClick={() => !isExpanded && setIsExpanded(true)}
     >
       {/* ---------------------------

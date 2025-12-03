@@ -1,48 +1,20 @@
 "use client";
 import React, { useState } from "react";
 import { Search, Edit2, Eye } from "lucide-react";
-import { AppSidebar } from "@/app/(admin)/-componentes/app-sidebar";
+import { AppSidebar } from "@/app/(views)/-componentes/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-
-interface Proyecto {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  recurso: string;
-  grupoAsignado: string;
-  estado: string;
-  fechaEntrega: string;
-}
+import { MOCK_PROYECTOS_DETALLADOS, MOCK_GRUPOS, ProyectoDetallado } from "@/data/mockData";
 
 export default function ProyectosPage() {
-  const [proyectos, setProyectos] = useState<Proyecto[]>([
-    {
-      id: 1,
-      nombre: "Proyecto A",
-      descripcion: "Diseño de campaña publicitaria",
-      recurso: "Canva",
-      grupoAsignado: "Área 1",
-      estado: "Activo",
-      fechaEntrega: "2025-12-15",
-    },
-    {
-      id: 2,
-      nombre: "Proyecto B",
-      descripcion: "Optimización de servidor",
-      recurso: "AWS",
-      grupoAsignado: "Área 2",
-      estado: "Pendiente",
-      fechaEntrega: "2026-01-20",
-    },
-  ]);
+  const [proyectos, setProyectos] = useState<ProyectoDetallado[]>(MOCK_PROYECTOS_DETALLADOS);
 
   const [searchProyectos, setSearchProyectos] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit" | "view">("add");
-  const [selectedProyecto, setSelectedProyecto] = useState<Proyecto | null>(null);
-  const [grupos, setGrupos] = useState(["Área 1", "Área 2", "Área 3"]);
+  const [selectedProyecto, setSelectedProyecto] = useState<ProyectoDetallado | null>(null);
+  const [grupos, setGrupos] = useState(MOCK_GRUPOS);
 
-  const [formData, setFormData] = useState<Proyecto>({
+  const [formData, setFormData] = useState<ProyectoDetallado>({
     id: 0,
     nombre: "",
     descripcion: "",
@@ -71,14 +43,14 @@ export default function ProyectosPage() {
     setModalOpen(true);
   };
 
-  const handleEdit = (proyecto: Proyecto) => {
+  const handleEdit = (proyecto: ProyectoDetallado) => {
     setSelectedProyecto(proyecto);
     setFormData({ ...proyecto });
     setModalMode("edit");
     setModalOpen(true);
   };
 
-  const handleView = (proyecto: Proyecto) => {
+  const handleView = (proyecto: ProyectoDetallado) => {
     setSelectedProyecto(proyecto);
     setFormData({ ...proyecto });
     setModalMode("view");

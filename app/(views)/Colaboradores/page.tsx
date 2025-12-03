@@ -1,12 +1,12 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, Edit2, ChevronDown, Plus, Trash2 } from 'lucide-react';
 import { AppSidebar } from '@/app/(views)/-componentes/app-sidebar'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { MOCK_COLABORADORES, MOCK_CARGOS, MOCK_ROLES, MOCK_AREAS, MOCK_INSTITUCIONES, Colaborador, UserRole } from '@/data/mockData';
 
-export default function Page() {
+function ColaboradoresContent() {
   const searchParams = useSearchParams();
   const [colaboradores, setColaboradores] = useState<Colaborador[]>(MOCK_COLABORADORES);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -657,5 +657,13 @@ export default function Page() {
 
       </SidebarInset>
     </SidebarProvider>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <ColaboradoresContent />
+    </Suspense>
   );
 }

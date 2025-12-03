@@ -48,6 +48,8 @@ export interface Colaborador {
   direccion?: string;
   schedule?: Schedule;
   estado?: 'activo' | 'descanso' | 'fuera'; // No aplica para Admin
+  lat?: number;
+  lng?: number;
 }
 
 export interface KPI {
@@ -435,6 +437,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=admin',
     carrera: 'Ingeniería de Sistemas',
     direccion: 'Av. Paseo de la República 3500, Lima, Perú',
+    lat: -12.0854,
+    lng: -77.0314,
     schedule: {
       L: { start: '08:00', end: '17:00', type: 'Virtual' },
       M: { start: '08:00', end: '17:00', type: 'Virtual' },
@@ -459,6 +463,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=carlos',
     carrera: 'Administración de Empresas',
     direccion: 'Calle Las Flores 245, San Isidro, Lima, Perú',
+    lat: -12.0968,
+    lng: -77.0358,
     estado: 'descanso',
     schedule: {
       L: { start: '08:00', end: '17:00', type: 'Presencial' },
@@ -484,6 +490,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=marta',
     carrera: 'Gestión del Talento Humano',
     direccion: 'Av. del Parque 1200, Miraflores, Lima, Perú',
+    lat: -12.1209,
+    lng: -77.0299,
     estado: 'fuera',
     schedule: {
       L: { start: '09:00', end: '18:00', type: 'Presencial' },
@@ -509,6 +517,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=juan',
     carrera: 'Ingeniería de Sistemas',
     direccion: 'Jr. Amazonas 567, Pueblo Libre, Lima, Perú',
+    lat: -12.0851,
+    lng: -77.0318,
     estado: 'fuera',
     schedule: {
       L: { start: '08:30', end: '17:30', type: 'Virtual' },
@@ -534,6 +544,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=diego',
     carrera: 'Ingeniería Informática',
     direccion: 'Av. Los Andes 890, Lima, Perú',
+    lat: -12.0969,
+    lng: -77.0359,
     estado: 'fuera',
     schedule: {
       L: { start: '08:00', end: '17:00', type: 'Virtual' },
@@ -559,6 +571,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=pedro',
     carrera: 'Ingeniería de Software',
     direccion: 'Calle Principal 456, Breña, Lima, Perú',
+    lat: -12.0642,
+    lng: -77.0372,
     estado: 'activo',
     schedule: {
       L: { start: '07:00', end: '16:00', type: 'Virtual' },
@@ -584,6 +598,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=ana',
     carrera: 'Análisis de Sistemas',
     direccion: 'Av. Principal 123, Cercado, Lima, Perú',
+    lat: -12.0852,
+    lng: -77.0316,
     estado: 'activo',
     schedule: {
       L: { start: '08:30', end: '17:30', type: 'Virtual' },
@@ -609,6 +625,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=luis',
     carrera: 'Ciencia de Datos',
     direccion: 'Jr. Libertad 789, Surco, Lima, Perú',
+    lat: -12.0853,
+    lng: -77.0317,
     estado: 'fuera',
     schedule: {
       L: { start: '08:30', end: '17:30', type: 'Virtual' },
@@ -634,6 +652,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=sofia',
     carrera: 'Programación de Sistemas',
     direccion: 'Av. Arequipa 1000, Miraflores, Lima, Perú',
+    lat: -12.1208,
+    lng: -77.0298,
     estado: 'descanso',
     schedule: {
       L: { start: '08:00', end: '17:00', type: 'Virtual' },
@@ -659,6 +679,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=miguel',
     carrera: 'Ingeniería de Sistemas',
     direccion: 'Calle Bolognesi 555, San Isidro, Lima, Perú',
+    lat: -12.0967,
+    lng: -77.0357,
     estado: 'descanso',
     schedule: {
       L: { start: '08:00', end: '17:00', type: 'Virtual' },
@@ -684,6 +706,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=elena',
     carrera: 'Desarrollo Web',
     direccion: 'Av. Javier Prado 2000, La Molina, Lima, Perú',
+    lat: -12.0641,
+    lng: -77.0371,
     estado: 'descanso',
     schedule: {
       L: { start: '07:00', end: '16:00', type: 'Virtual' },
@@ -709,6 +733,8 @@ export const MOCK_COLABORADORES: Colaborador[] = [
     avatar: 'https://i.pravatar.cc/150?u=rafael',
     carrera: 'Ingeniería Informática',
     direccion: 'Jr. Machu Picchu 3000, Rimac, Lima, Perú',
+    lat: -12.0643,
+    lng: -77.0373,
     estado: 'fuera',
     schedule: {
       L: { start: '07:00', end: '16:00', type: 'Virtual' },

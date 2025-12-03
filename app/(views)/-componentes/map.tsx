@@ -10,6 +10,8 @@ import {
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { MOCK_COLABORADORES } from '@/data/mockData';
 
 type Trabajador = {
   id: string;
@@ -49,7 +51,7 @@ function ZoomToDistrito({ distrito }: { distrito: Distrito }) {
   
   useEffect(() => {
     if (!hasZoomed.current) {
-      map.setView([distrito.lat, distrito.lng], 16);
+      map.setView([distrito.lat, distrito.lng], 14);
       hasZoomed.current = true;
     }
   }, [distrito.lat, distrito.lng, map]);
@@ -62,6 +64,7 @@ type ResetViewButtonProps = {
   setLocalDistrito: (d: Distrito | null) => void;
   initialCenter: [number, number];
   initialZoom: number;
+  showReset: boolean;
 };
 
 function ResetViewButton({
@@ -69,8 +72,12 @@ function ResetViewButton({
   setLocalDistrito,
   initialCenter,
   initialZoom,
+  showReset,
 }: ResetViewButtonProps) {
   const map = useMap();
+
+  if (!showReset) return null;
+
   return (
     <button
       onClick={() => {
@@ -97,15 +104,28 @@ function ResetViewButton({
 
 export default function Mapa({
   distritos,
-  trabajadores,
+  trabajadores: trabajadoresFromProps,
   zoom,
   setZoom,
   setSelectedDistrito,
 }: MapaProps) {
+  const router = useRouter();
   const [localDistrito, setLocalDistrito] = useState<Distrito | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const initialCenter: [number, number] = [-12.0464, -77.0428];
   const initialZoom = 12;
+
+  // Convertir MOCK_COLABORADORES a formato de trabajadores
+  const trabajadores = useMemo(() => {
+    return MOCK_COLABORADORES.map((col, idx) => ({
+      id: col.id.toString(),
+      nombre: col.nombre,
+      lat: -12.0464 + (idx % 3) * 0.01,
+      lng: -77.0428 + (idx % 3) * 0.01,
+      distrito: col.area || 'Lima',
+      email: col.correo,
+    }));
+  }, []);
 
   // Determina qué mostrar basado en zoom ACTUAL, no en props
   const [currentZoom, setCurrentZoom] = useState(initialZoom);
@@ -171,6 +191,7 @@ export default function Mapa({
             setLocalDistrito={setLocalDistrito}
             initialCenter={initialCenter}
             initialZoom={initialZoom}
+            showReset={!mostrarDistritos}
           />
         )}
 
@@ -198,6 +219,7 @@ export default function Mapa({
                 position={[t.lat, t.lng]}
                 icon={iconTrabajador}
                 eventHandlers={{
+                  click: () => router.push(`/Chat?user=${t.id}`),
                   mouseover: (e) => e.target.openPopup(),
                   mouseout: (e) => e.target.closePopup(),
                 }}

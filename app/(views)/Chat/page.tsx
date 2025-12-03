@@ -1,9 +1,10 @@
 'use client';
+import { Suspense, useState, useRef, useEffect, useMemo } from "react";
 import { AppSidebar } from "@/app/(views)/-componentes/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { useState, useRef, useEffect, useMemo } from "react";
 import { Search, Send, Paperclip, X, Check, CheckCheck, Image as ImageIcon } from "lucide-react";
 import { MOCK_COLABORADORES, MOCK_AREAS } from "@/data/mockData";
+import { useSearchParams } from "next/navigation";
 
 interface Message {
   id: string;
@@ -11,10 +12,19 @@ interface Message {
   text: string;
   timestamp: Date;
   status: 'sending' | 'sent' | 'read';
-  image?: string; // base64 image
+  image?: string;
 }
 
 export default function Page() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen">Cargando chat...</div>}>
+      <ChatContent />
+    </Suspense>
+  );
+}
+
+function ChatContent() {
+  const searchParams = useSearchParams();
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -32,17 +42,26 @@ export default function Page() {
       setCurrentUser(JSON.parse(user));
     }
 
-    // Verificar si hay un usuario pre-seleccionado desde Mi Equipo
-    const selectedUser = localStorage.getItem('selectedChatUser');
-    if (selectedUser) {
-      const userData = JSON.parse(selectedUser);
-      setSelectedUser(userData);
-      // Buscar el área para expandirla
-      setSelectedArea(userData.area);
-      // Limpiar el localStorage
-      localStorage.removeItem('selectedChatUser');
+    // Verificar si hay un usuario pre-seleccionado desde URL (mapa)
+    const userParam = searchParams.get('user');
+    if (userParam) {
+      const userId = parseInt(userParam);
+      const userData = MOCK_COLABORADORES.find(c => c.id === userId);
+      if (userData) {
+        setSelectedUser(userData);
+        setSelectedArea(userData.area);
+      }
+    } else {
+      // Verificar si hay un usuario pre-seleccionado desde Mi Equipo (localStorage)
+      const selectedUser = localStorage.getItem('selectedChatUser');
+      if (selectedUser) {
+        const userData = JSON.parse(selectedUser);
+        setSelectedUser(userData);
+        setSelectedArea(userData.area);
+        localStorage.removeItem('selectedChatUser');
+      }
     }
-  }, []);
+  }, [searchParams]);
 
   // Auto-scroll al final del chat
   useEffect(() => {
